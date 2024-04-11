@@ -1,5 +1,7 @@
-import fs from 'node:fs/promises'
-import express from 'express'
+import fs from 'node:fs/promises';
+import express from 'express';
+import { syncDatabase } from './src/database/index.js';
+
 
 // Constants
 const isProduction = process.env.NODE_ENV === 'production'
@@ -71,7 +73,15 @@ app.use('*', async (req, res) => {
   }
 })
 
-// Start http server
-app.listen(port, () => {
-  console.log(`Server started at http://localhost:${port}`)
-})
+
+syncDatabase()
+  .then(() => {
+    app.listen(port, () => {
+      console.log(`Server started at http://localhost:${port}`);
+    });
+  })
+  .catch((error) => {
+    console.error('Error starting the server:', error);
+  });
+
+
