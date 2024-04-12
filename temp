@@ -1,7 +1,5 @@
 CREATE DATABASE task_management;
 
-\c task_management;
-
 CREATE USER db_username WITH PASSWORD 'db_password';
 
 GRANT CONNECT ON DATABASE task_management TO db_username;

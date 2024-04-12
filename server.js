@@ -1,7 +1,11 @@
 import fs from 'node:fs/promises';
-import express from 'express';
 import { syncDatabase } from './src/database/index.js';
+import { app } from './api.js'
 
+import { Server } from "socket.io";
+import { createServer } from 'http';
+
+const httpServer = createServer(app);
 
 // Constants
 const isProduction = process.env.NODE_ENV === 'production'
@@ -16,15 +20,13 @@ const ssrManifest = isProduction
   ? await fs.readFile('./dist/client/.vite/ssr-manifest.json', 'utf-8')
   : undefined
 
-// Create http server
-const app = express()
 
 // Add Vite or respective production middlewares
 let vite
 if (!isProduction) {
   const { createServer } = await import('vite')
   vite = await createServer({
-    server: { middlewareMode: true },
+    server: { middlewareMode: true,},
     appType: 'custom',
     base
   })
@@ -35,6 +37,33 @@ if (!isProduction) {
   app.use(compression())
   app.use(base, sirv('./dist/client', { extensions: [] }))
 }
+
+const io = new Server(httpServer, {
+  cors: {
+    origin: isProduction ? undefined : `http://localhost:${port}`,
+    allowedHeaders: ["my-custom-header"],
+    credentials: true
+  }
+});
+
+io.on('connection', socket => {
+  console.log("Client connected");
+
+  socket.on("disconnect", (reason) => {
+    console.log(reason, 'client disconnected')
+  });
+
+
+  // Add this listener for the "test" event
+  socket.on("test", message => {
+    console.log("Test event received on server-side");
+    console.log("Received message:", message);
+
+    // Emit a "test-event" event back to the client
+    io.emit('test-event', message);
+  });
+
+});
 
 // Serve HTML
 app.use('*', async (req, res) => {
@@ -76,7 +105,7 @@ app.use('*', async (req, res) => {
 
 syncDatabase()
   .then(() => {
-    app.listen(port, () => {
+    httpServer.listen(port, () => {
       console.log(`Server started at http://localhost:${port}`);
     });
   })

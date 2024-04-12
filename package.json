@@ -20,7 +20,10 @@
     "pg-hstore": "^2.3.4",
     "sequelize": "^6.37.2",
     "sirv": "^2.0.4",
-    "vue": "^3.3.13"
+    "socket.io": "^4.7.5",
+    "socket.io-client": "^4.7.5",
+    "vue": "^3.3.13",
+    "vue-socket.io": "^3.0.10"
   },
   "devDependencies": {
     "@vitejs/plugin-vue": "^4.5.2",
