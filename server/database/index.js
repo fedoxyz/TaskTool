@@ -80,7 +80,6 @@ async function setupDB() {
 
         await sequelize.sync();
         
-        return db;
         // await db.<ModelName>.create({ <key: "value"> }); // THIS CREATES ENTRIES
     } catch (error) {
         console.error(error);
@@ -88,5 +87,6 @@ async function setupDB() {
 }
 
 module.exports = {
+    db,
     setupDB
   };
