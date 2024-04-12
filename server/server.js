@@ -1,17 +1,56 @@
 
+const { Server } = require('socket.io');
+
+const http = require('http');
+
 require('dotenv').config()
 
+const port = process.env.PORT
 
 const { setupDB } = require('./database');
 
-
+  
 // CREATE APIs URL ENDPOINTS TO CREATE AND DELETE TO DO ITEMS
 async function startServer() {
     try {
         const db = await setupDB()
-        const port = 3001
+
         const express = require('express')
+
         const app = express()
+
+        const httpServer = http.createServer(app);
+
+        const io = new Server(httpServer, {
+            cors: {
+              origin: `http://localhost:${port}`,
+              allowedHeaders: ["my-custom-header"],
+              credentials: true
+            }
+          });
+
+        
+          io.on('connection', socket => {
+            console.log("Client connected");
+          
+            socket.on("disconnect", (reason) => {
+              console.log(reason, 'client disconnected')
+            });
+          
+          
+            // Add this listener for the "test" event
+            socket.on("test", message => {
+              console.log("Test event received on server-side");
+              console.log("Received message:", message);
+          
+              // Emit a "test-event" event back to the client
+              io.emit('test-event', message);
+            });
+          
+          });
+        
+
+
         app.use(express.json())
         app.get('/', (req, res) => {
             res.send('hello world')
@@ -52,7 +91,7 @@ async function startServer() {
         });
 
 
-        app.listen(port, () => {
+        httpServer.listen(port, () => {
             console.log(`App listening on port ${port}`) 
         })
     } catch (error) {
