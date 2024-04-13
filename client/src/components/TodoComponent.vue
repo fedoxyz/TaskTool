@@ -7,7 +7,6 @@ const todos = ref([])
 
 
 async function addTask(text) {
-  console.log(text, 'task')
   try {
     console.log('123')
     const requestOptions = {
@@ -15,8 +14,7 @@ async function addTask(text) {
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ text: text })
     };
-    const response = await fetch(`${import.meta.env.VITE_API_HOST}:${import.meta.env.VITE_API_PORT}/api/tasks`, requestOptions)
-    return await response.json();
+    await fetch(`${import.meta.env.VITE_API_HOST}:${import.meta.env.VITE_API_PORT}/api/tasks`, requestOptions)
   } catch (error) {
     console.error(error);
   }
@@ -71,7 +69,7 @@ async function fetchTasks() {
 </script>
 
 <template>
-  <div id="containerr" style="text-align: center; display: inline-block; width: 49%;"> 
+  <div id="container" style="text-align: center; display: inline-block; width: 49%;"> 
 
       <input autofocus placeholder="add your texthere" id='inptBtn' v-model="newTodo">
       <button @click="addTask(newTodo)" id="addBtn">Add Todo</button>     
@@ -114,61 +112,5 @@ async function fetchTasks() {
     background-color: transparent;
   }
 
-  input {
-    margin-bottom: 10px;
-    padding: 10px;
-    border-radius: 5px;
-    color: black; 
-  }
-
-
-
-
-  #inptBtn {
-    border-radius: 23px;
-    height: 59px;
-    margin-bottom: 5%;
-    width: 89%;
-    background: transparent;
-    color: white; 
-  }
-
-
-  #addBtn {
-    width: 50%;
-    border: 1px solid white !important;
-  }
-
-
-  button {
-    padding: 10px;
-    background-color: transparent;
-    color: white;
-    border: none;
-    padding: 12px;
-    border-radius: 12px;
-    cursor: pointer;
-  }
-
-  button:hover {
-    background-color: #aaaaaa23;
-  }
-
-  ul {
-    list-style-type: none;
-    padding: 0;
-  }
-
-  li {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin-bottom: 10px;
-    padding: 10px;
-    border: 1px solid #ffffff4a;
-    border-radius: 23px;
-    background-color: #fff;
-    color: rgb(255, 255, 255); 
-    background-color: transparent;
-  }
+ 
 </style>

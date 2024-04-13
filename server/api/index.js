@@ -2,7 +2,7 @@ const express = require('express');
 const app = express();
 const cors = require('cors')
 const { db } = require('../database')
-
+const jwt = require("jsonwebtoken");
 
 
 // Error handling middleware
@@ -27,8 +27,9 @@ app.use(express.json())
 // GET METHOD API URL | RETRIEVE ITEMS
 app.get('/api/users', async (req, res, next) => {
   try {
-    const users = await db.User.findAll();
-    res.json(users);
+    
+    const user = await db.User.findAll();
+    res.json(user);
     req.io.emit('test', message);
   } catch (error) {
     next(error);
@@ -101,6 +102,28 @@ app.delete('/api/tasks/:id', async (req, res, next) => {
     next(error);
   }
 });
+
+
+// SIGN UP
+app.post('/api/sign-up', async (req, res, next) => {
+  try {
+    const user = await db.User.create(req.body);
+    res.json(user);
+  } catch (error) {
+    next(error);
+  }
+});
+
+// SIGN IN
+app.post('/api/sign-in', async (req, res, next) => {
+  try {
+    const user = await db.User.findAll();
+    res.json(user);
+  } catch (error) {
+    next(error);
+  }
+});
+
 
 
 

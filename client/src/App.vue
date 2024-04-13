@@ -34,4 +34,67 @@ body {
   height: 100vh;
   margin: 0;
 }
+
+ input {
+    margin-bottom: 10px;
+    padding: 10px;
+    border-radius: 5px;
+    color: black; 
+  }
+
+
+
+
+  #inptBtn {
+    border-radius: 23px;
+    height: 59px;
+    margin-bottom: 5%;
+    width: 89%;
+    background: transparent;
+    color: white; 
+  }
+
+
+  #addBtn {
+    width: 50%;
+    border: 1px solid white !important;
+  }
+
+
+  button {
+    padding: 10px;
+    background-color: transparent;
+    color: white;
+    border: none;
+    padding: 12px;
+    border-radius: 12px;
+    cursor: pointer;
+  }
+
+  button:hover {
+    background-color: #aaaaaa23;
+  }
+
+  ul {
+    list-style-type: none;
+    padding: 0;
+  }
+
+  li {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 10px;
+    padding: 10px;
+    border: 1px solid #ffffff4a;
+    border-radius: 23px;
+    background-color: #fff;
+    color: rgb(255, 255, 255); 
+    background-color: transparent;
+  }
+
+  .error {
+    color: red;
+  }
+
 </style>
