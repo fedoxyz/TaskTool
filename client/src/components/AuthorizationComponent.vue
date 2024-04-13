@@ -45,6 +45,10 @@ async function SignIn() {
       console.error("Failed", jsonResponse.message, response.ok);
     }
   } catch (error) {
+    data.isMessage = true;
+    data.isError = true;
+    data.message = 'Failed to sign in (check backend)';
+    console.error(error);
     console.error(error);
   }
 }
@@ -65,11 +69,14 @@ async function SignUp() {
     } else {
         data.isMessage = true;
         data.isError = true;
-        data.message = 'Failed to sig123n up';
+        data.message = 'Try different username/email';
       console.error("Failed", response.statusText);
     }
     return await response.json();
   } catch (error) {
+    data.isMessage = true;
+    data.isError = true;
+    data.message = 'Failed to sign up (check backend)';
     console.error(error);
   }
 }
