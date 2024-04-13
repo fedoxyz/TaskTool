@@ -1,4 +1,5 @@
 const { Sequelize, DataTypes } = require('sequelize');
+const bcrypt = require('bcrypt');
 require('dotenv').config()
 
 var db = {}
@@ -10,6 +11,7 @@ const sequelize = new Sequelize(process.env.DB_NAME, process.env.DB_USERNAME, pr
 
 async function setupDB() {
     try {
+      
         
         db.User = sequelize.define('users', {
             id: {
@@ -33,6 +35,11 @@ async function setupDB() {
               allowNull: false,
             },
           });
+1
+        db.User.beforeCreate(async (user) => {
+            const salt = await bcrypt.genSaltSync(10);
+            user.password = bcrypt.hashSync(user.password, salt);
+          }); 
 
         // CREATE MODEL OF tasks TABLE
         db.Task = sequelize.define('tasks', {

@@ -1,7 +1,6 @@
 <script setup>
 import { ref, reactive, watch } from 'vue'
 
-
 const isSignIn = ref(true)
 const data = reactive({
     isMessage: false,
@@ -23,22 +22,24 @@ function switchTab() {
 
 async function SignIn() {
    try {
-    console.log('123')
     const requestOptions = {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ username: user.username, password: user.password })
+      body: JSON.stringify({ email: user.email, password: user.password })
     };
     const response = await fetch(`${import.meta.env.VITE_API_HOST}:${import.meta.env.VITE_API_PORT}/api/sign-in`, requestOptions)
     if (response.ok) {
-      console.log('Signed In')
-      
+      console.log(...response.headers, await response.json())
+        data.isMessage = true;
+        data.isError = false;
+        data.message = 'Successfully signed in';
     } else {
+    const jsonResponse = await response.json()
+    data.isMessage = true;
     data.isError = true;
-    data.errorMessage = 'Failed to sign in, please, check provided credentials';
-      console.error("Failed", response.statusText);
+    data.message = jsonResponse.message;
+      console.error("Failed", jsonResponse.message, response.ok);
     }
-    return await response.json();
   } catch (error) {
     console.error(error);
   }
@@ -54,12 +55,13 @@ async function SignUp() {
     };
     const response = await fetch(`${import.meta.env.VITE_API_HOST}:${import.meta.env.VITE_API_PORT}/api/sign-up`, requestOptions)
     if (response.ok) {
-      console.log('Signed Up')
-      
+        data.isMessage = true;
+        data.isError = false;
+        data.message = 'User created, now sign in';
     } else {
         data.isMessage = true;
         data.isError = true;
-        data.message = 'Failed to sign up';
+        data.message = 'Failed to sig123n up';
       console.error("Failed", response.statusText);
     }
     return await response.json();

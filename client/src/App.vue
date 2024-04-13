@@ -93,6 +93,9 @@ body {
     background-color: transparent;
   }
 
+  span {
+    color: white;
+  }
   .error {
     color: red;
   }

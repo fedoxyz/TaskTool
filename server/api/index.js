@@ -2,8 +2,9 @@ const express = require('express');
 const app = express();
 const cors = require('cors')
 const { db } = require('../database')
-const jwt = require("jsonwebtoken");
-
+const cookieParser = require('cookie-parser');
+const jwt = require('jsonwebtoken');
+const bcrypt = require('bcrypt');
 
 // Error handling middleware
 function errorHandler(err, req, res, next) {
@@ -14,10 +15,20 @@ function errorHandler(err, req, res, next) {
 // Register the error handling middleware
 app.use(errorHandler);
 
+// Register the cookieParser
+app.use(cookieParser());
+
 // socket.io middleware
 app.use(function(req, res, next) {
     req.io = app.get("io");
     next();
+});
+
+app.use((req, res, next) => {
+  res.append('Access-Control-Allow-Origin', ['*']);
+  res.append('Access-Control-Allow-Methods', 'GET,PUT,POST,DELETE');
+  res.append('Access-Control-Allow-Headers', 'Content-Type');
+  next();
 });
 
 // enable cors requests
@@ -117,8 +128,30 @@ app.post('/api/sign-up', async (req, res, next) => {
 // SIGN IN
 app.post('/api/sign-in', async (req, res, next) => {
   try {
-    const user = await db.User.findAll();
-    res.json(user);
+    const { email, password } = req.body;
+    const user = await db.User.findOne({
+      where: {
+        email: email
+      }
+    });
+
+    if (!user) {
+      res.status(401).json({ message: 'Invalid email or password' });
+    } 
+
+  const isMatch = bcrypt.compareSync(password, user.password);
+  if (isMatch) {
+    const token = jwt.sign({ email: user.email, password: user.password }, process.env.JWT_KEY);
+    res.set('Authorization', `Bearer ${token}`);
+    res.set("Access-Control-Expose-Headers","Authorization"); // for cors
+      res.json({ user });
+      
+  } else {
+    res.status(401).json({ message: 'Invalid email or password' });
+  }
+      
+
+
   } catch (error) {
     next(error);
   }
