@@ -12,7 +12,7 @@ async function startServer() {
 
         const httpServer = require('http').createServer(app);
 
-        const io = require('./api/socketServer').setupSocketServer(httpServer, port);
+        const io = require('./api/socketServer').setupSocketServer(httpServer);
 
         app.set("io", io);
 

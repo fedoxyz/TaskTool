@@ -1,6 +1,6 @@
 const express = require('express');
 const app = express();
-
+const cors = require('cors')
 const { db } = require('../database')
 
 
@@ -19,6 +19,9 @@ app.use(function(req, res, next) {
     req.io = app.get("io");
     next();
 });
+
+// enable cors requests
+app.use(cors())
 
 app.use(express.json())
 // GET METHOD API URL | RETRIEVE ITEMS
@@ -66,6 +69,7 @@ app.get('/api/tasks', async (req, res, next) => {
 app.post('/api/tasks', async (req, res, next) => {
   try {
     const task = await db.Task.create(req.body);
+    req.io.emit('task-added', task);
     res.json(task);
   } catch (error) {
     next(error);
@@ -84,12 +88,14 @@ app.put('/api/tasks', async (req, res, next) => {
 
 // DELETE METHOD API URL | DELETE ITEM
 app.delete('/api/tasks/:id', async (req, res, next) => {
+  console.log('we here')
   try {
     await db.Task.destroy({
       where: {
         id: req.params.id
       }
     });
+    req.io.emit('task-removed', req.params.id);
     res.sendStatus(204);
   } catch (error) {
     next(error);

@@ -33,25 +33,29 @@ async function setupDB() {
 
         // CREATE MODEL OF tasks TABLE
         db.Task = sequelize.define('tasks', {
-            id: {
-              type: DataTypes.INTEGER,
-              primaryKey: true,
-              autoIncrement: true,
-            },
-            title: {
-              type: DataTypes.STRING(255),
-              allowNull: false,
-            },
-            description: {
-              type: DataTypes.TEXT,
-            },
-            status: {
-              type: DataTypes.INTEGER,
-              allowNull: false,
-            },
-            due_date: {
-              type: DataTypes.DATE,
-            },
+          text: {
+            type: DataTypes.STRING,
+            allowNull: false
+        },
+            // id: {
+            //   type: DataTypes.INTEGER,
+            //   primaryKey: true,
+            //   autoIncrement: true,
+            // },
+            // title: {
+            //   type: DataTypes.STRING(255),
+            //   allowNull: false,
+            // },
+            // description: {
+            //   type: DataTypes.TEXT,
+            // },
+            // status: {
+            //   type: DataTypes.INTEGER,
+            //   allowNull: false,
+            // },
+            // due_date: {
+            //   type: DataTypes.DATE,
+            // },
           });
 
         db.TaskBoard = sequelize.define('task_boards', {
@@ -78,7 +82,7 @@ async function setupDB() {
           });
 
 
-        await sequelize.sync();
+        await sequelize.sync({force: true});
         
         // await db.<ModelName>.create({ <key: "value"> }); // THIS CREATES ENTRIES
     } catch (error) {
