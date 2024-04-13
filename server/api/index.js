@@ -26,6 +26,7 @@ router.use(function(req, res, next) {
     next();
 });
 
+// evade issues with headers
 app.use((req, res, next) => {
   res.append('Access-Control-Allow-Origin', ['*']);
   res.append('Access-Control-Allow-Methods', 'GET,PUT,POST,DELETE');
@@ -34,11 +35,11 @@ app.use((req, res, next) => {
   next();
 });
 
-
-
 // enable cors requests
 app.use(cors())
 
+
+// Protected router for API calls
 
 router.use(async (req, res, next) => {
   try {
@@ -48,29 +49,16 @@ router.use(async (req, res, next) => {
       console.log('no auth headers')
     return res.status(403).json({ error: 'No credentials sent!' });
     }
+    const token = req.headers.authorization.split(' ')[1];
+    jwt.verify(token, process.env.JWT_KEY);
     next();
-    // const token = req.headers.authorization.split(' ')[1];
-    // const decodedToken = jwt.verify(token, process.env.JWT_KEY);
-    // console.log(decodedToken)
-    // if (decodedToken) {
-    //   res.status(200).json()
-    // } else {
-    //   res.status(401).json({ message: 'Unauthorized' });
-    // }
+  
   } catch (error) {
+    console.log('we catch here')
     next(error);
   }
 })
 
-// middleware for handling jwt verification
-// router.use(async (req, res, next) => {
-//   if (!req.headers.authorization) {
-
-//     console.log('rejecte123123d', req.method, req.url)
-//     return res.status(403).json({ error: 'No credentials sent!' });
-//   }
-//   next();
-// });
 
 app.use(express.json())
 // GET METHOD API URL | RETRIEVE ITEMS
@@ -87,19 +75,16 @@ app.get('/api/users', async (req, res, next) => {
 
 
 
-// post method to verify JWT token
+// post method to verify JWT token on vue router
 app.post('/api/verify', async (req, res, next) => {
   try {
     console.log(req.headers, 'verify headers')
     const token = req.headers.authorization.split(' ')[1];
-    const decodedToken = jwt.verify(token, process.env.JWT_KEY);
-    console.log(decodedToken)
-    if (decodedToken) {
-      res.status(200).json()
-    } else {
-      res.status(401).json({ message: 'Unauthorized' });
-    }
+    console.log(token, 'token for vertification')
+    jwt.verify(token, process.env.JWT_KEY);
+    res.status(200).json();
   } catch (error) {
+    console.log('TOKEN')
     next(error);
   }
 });
