@@ -3,11 +3,22 @@ const app = express();
 
 const { db } = require('../database')
 
+
+
 // Error handling middleware
 function errorHandler(err, req, res, next) {
   console.error(err.stack);
   res.status(500).json({ error: 'Internal Server Error' });
 }
+
+// Register the error handling middleware
+app.use(errorHandler);
+
+// socket.io middleware
+app.use(function(req, res, next) {
+    req.io = app.get("io");
+    next();
+});
 
 app.use(express.json())
 // GET METHOD API URL | RETRIEVE ITEMS
@@ -15,6 +26,7 @@ app.get('/api/users', async (req, res, next) => {
   try {
     const users = await db.User.findAll();
     res.json(users);
+    req.io.emit('test', message);
   } catch (error) {
     next(error);
   }
@@ -84,7 +96,6 @@ app.delete('/api/tasks/:id', async (req, res, next) => {
   }
 });
 
-// Register the error handling middleware
-app.use(errorHandler);
+
 
 module.exports = app;

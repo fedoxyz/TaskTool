@@ -9,6 +9,7 @@ function setupSocketServer(httpServer, port) {
     }
   });
 
+
   io.on('connection', socket => {
     console.log("Client connected");
 
@@ -26,7 +27,6 @@ function setupSocketServer(httpServer, port) {
     });
   });
 
-  return io;
 }
 
 module.exports = { setupSocketServer };
