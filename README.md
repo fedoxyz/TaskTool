@@ -1,7 +1,7 @@
 # Shell
-`git clone https://github.com/fedoxyz/TaskTool.git`\n
-`cd TaskTool/server && npm init`\n
-`sudo -u postgres psql`\n
+`git clone https://github.com/fedoxyz/TaskTool.git`
+`cd TaskTool/server && npm init`
+`sudo -u postgres psql`
 
 # SQL query to setup database 
 ```
