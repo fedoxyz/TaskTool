@@ -1,6 +1,10 @@
 <script setup>
-import { ref, reactive, watch } from 'vue'
+import { ref, reactive, watch } from 'vue';
+import { useRouter } from 'vue-router';
 
+const router = useRouter();
+
+const isSignedIn = ref(false)
 const isSignIn = ref(true)
 const data = reactive({
     isMessage: false,
@@ -14,8 +18,6 @@ const user = reactive({
 })
 
 
-
-
 function switchTab() {
   isSignIn.value = !isSignIn.value
 }
@@ -27,14 +29,16 @@ async function SignIn() {
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ email: user.email, password: user.password })
     };
-    const response = await fetch(`${import.meta.env.VITE_API_HOST}:${import.meta.env.VITE_API_PORT}/api/sign-in`, requestOptions)
+    const response = await fetch(`${import.meta.env.VITE_API_HOST}:${import.meta.env.VITE_API_PORT}/api/sign-in`, requestOptions) // fetch api
+    const jsonResponse = await response.json() // read stream
     if (response.ok) {
-      console.log(...response.headers, await response.json())
         data.isMessage = true;
         data.isError = false;
         data.message = 'Successfully signed in';
+        document.cookie = "token=" + response.headers.get('Authorization') + ";path=/"; // add token to cookies
+        console.log(document.cookie, 'cookie')
+        router.push('/app');
     } else {
-    const jsonResponse = await response.json()
     data.isMessage = true;
     data.isError = true;
     data.message = jsonResponse.message;

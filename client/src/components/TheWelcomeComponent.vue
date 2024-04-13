@@ -2,8 +2,8 @@
   <div id='theContainer'>
     <h1>Hello World</h1>
     <h2>TaskTool </h2>
-    <router-link to="/todo-app">
-      <button style="margin: 23px; width: 24%;">View</button>
+    <router-link to="/app">
+      <button style="margin: 23px; width: 24%;">Start</button>
     </router-link>
   </div>
 </template>

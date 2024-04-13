@@ -5,16 +5,21 @@ import { socket } from '@/utils/socket'
 const newTodo = ref('')
 const todos = ref([])
 
-
 async function addTask(text) {
   try {
-    console.log('123')
+    const token = document.cookie.match('token=([^;]+)');
+    console.log(token[1], '123123')
     const requestOptions = {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json',
+      'Authorization': `${token[1]}`,
+      },
       body: JSON.stringify({ text: text })
-    };
-    await fetch(`${import.meta.env.VITE_API_HOST}:${import.meta.env.VITE_API_PORT}/api/tasks`, requestOptions)
+      };
+    console.log(requestOptions, 'requestedOptions')
+    const response = await fetch(`${import.meta.env.VITE_API_HOST}:${import.meta.env.VITE_API_PORT}/api/tasks`, requestOptions)
+    console.log(response)
+    newTodo.value = '';
   } catch (error) {
     console.error(error);
   }
@@ -23,8 +28,10 @@ async function addTask(text) {
 // FETCH API
 async function deleteTask(id) {
   try {
+    const token = document.cookie.match('token=([^;]+)');
     const requestOptions = {
       method: "DELETE",
+      headers: { 'Authorization': `${token[1]}` },
     };
     const response = await fetch(`${import.meta.env.VITE_API_HOST}:${import.meta.env.VITE_API_PORT}/api/tasks/${id}`, requestOptions);
 
@@ -46,6 +53,7 @@ onMounted(async () => {
 
   socket.on('task-added', async (newTask) => {
     console.log(newTask, 'newTask')
+    console.log(todos.value, 'value todos')
     todos.value.push(newTask);
   });
 
@@ -60,7 +68,12 @@ onMounted(async () => {
 
 async function fetchTasks() {
   try {
-    const response = await fetch(`${import.meta.env.VITE_API_HOST}:${import.meta.env.VITE_API_PORT}/api/tasks`);
+    const token = document.cookie.match('token=([^;]+)');
+    const requestOptions = {
+      method: "get",
+      headers: { 'Authorization': `${token[1]}` },
+    };
+    const response = await fetch(`${import.meta.env.VITE_API_HOST}:${import.meta.env.VITE_API_PORT}/api/tasks`, requestOptions);
     todos.value = await response.json();
   } catch (error) {
     console.error(error);

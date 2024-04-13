@@ -6,6 +6,8 @@ const cookieParser = require('cookie-parser');
 const jwt = require('jsonwebtoken');
 const bcrypt = require('bcrypt');
 
+const router = express.Router()
+
 // Error handling middleware
 function errorHandler(err, req, res, next) {
   console.error(err.stack);
@@ -13,13 +15,13 @@ function errorHandler(err, req, res, next) {
 }
 
 // Register the error handling middleware
-app.use(errorHandler);
+router.use(errorHandler);
 
 // Register the cookieParser
-app.use(cookieParser());
+router.use(cookieParser());
 
 // socket.io middleware
-app.use(function(req, res, next) {
+router.use(function(req, res, next) {
     req.io = app.get("io");
     next();
 });
@@ -28,11 +30,47 @@ app.use((req, res, next) => {
   res.append('Access-Control-Allow-Origin', ['*']);
   res.append('Access-Control-Allow-Methods', 'GET,PUT,POST,DELETE');
   res.append('Access-Control-Allow-Headers', 'Content-Type');
+  res.append('Access-Control-Allow-Credentials')
   next();
 });
 
+
+
 // enable cors requests
 app.use(cors())
+
+
+router.use(async (req, res, next) => {
+  try {
+    console.log('router authorization')
+    console.log(req.headers.authorization, 'authorization')
+    if (!req.headers.authorization) {
+      console.log('no auth headers')
+    return res.status(403).json({ error: 'No credentials sent!' });
+    }
+    next();
+    // const token = req.headers.authorization.split(' ')[1];
+    // const decodedToken = jwt.verify(token, process.env.JWT_KEY);
+    // console.log(decodedToken)
+    // if (decodedToken) {
+    //   res.status(200).json()
+    // } else {
+    //   res.status(401).json({ message: 'Unauthorized' });
+    // }
+  } catch (error) {
+    next(error);
+  }
+})
+
+// middleware for handling jwt verification
+// router.use(async (req, res, next) => {
+//   if (!req.headers.authorization) {
+
+//     console.log('rejecte123123d', req.method, req.url)
+//     return res.status(403).json({ error: 'No credentials sent!' });
+//   }
+//   next();
+// });
 
 app.use(express.json())
 // GET METHOD API URL | RETRIEVE ITEMS
@@ -42,6 +80,25 @@ app.get('/api/users', async (req, res, next) => {
     const user = await db.User.findAll();
     res.json(user);
     req.io.emit('test', message);
+  } catch (error) {
+    next(error);
+  }
+});
+
+
+
+// post method to verify JWT token
+app.post('/api/verify', async (req, res, next) => {
+  try {
+    console.log(req.headers, 'verify headers')
+    const token = req.headers.authorization.split(' ')[1];
+    const decodedToken = jwt.verify(token, process.env.JWT_KEY);
+    console.log(decodedToken)
+    if (decodedToken) {
+      res.status(200).json()
+    } else {
+      res.status(401).json({ message: 'Unauthorized' });
+    }
   } catch (error) {
     next(error);
   }
@@ -68,7 +125,7 @@ app.put('/api/users', async (req, res, next) => {
 });
 
 // GET METHOD API URL | RETRIEVE ITEMS
-app.get('/api/tasks', async (req, res, next) => {
+app.get('/api/tasks', router, async (req, res, next) => {
   try {
     const tasks = await db.Task.findAll();
     res.json(tasks);
@@ -78,7 +135,7 @@ app.get('/api/tasks', async (req, res, next) => {
 });
 
 // POST METHOD API URL | CREATE ITEM
-app.post('/api/tasks', async (req, res, next) => {
+app.post('/api/tasks', router, async (req, res, next) => {
   try {
     const task = await db.Task.create(req.body);
     req.io.emit('task-added', task);
@@ -89,7 +146,7 @@ app.post('/api/tasks', async (req, res, next) => {
 });
 
 // PUT METHOD API URL | UPDATE ITEM
-app.put('/api/tasks', async (req, res, next) => {
+app.put('/api/tasks', router, async (req, res, next) => {
   try {
     const task = await db.Task.update(req.body);
     res.json(task);
@@ -99,7 +156,7 @@ app.put('/api/tasks', async (req, res, next) => {
 });
 
 // DELETE METHOD API URL | DELETE ITEM
-app.delete('/api/tasks/:id', async (req, res, next) => {
+app.delete('/api/tasks/:id', router, async (req, res, next) => {
   console.log('we here')
   try {
     await db.Task.destroy({
@@ -128,6 +185,7 @@ app.post('/api/sign-up', async (req, res, next) => {
 // SIGN IN
 app.post('/api/sign-in', async (req, res, next) => {
   try {
+    console.log('signing in on server side')
     const { email, password } = req.body;
     const user = await db.User.findOne({
       where: {
