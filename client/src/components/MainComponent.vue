@@ -65,12 +65,12 @@ async function deleteTask(id) {
 
 
 onMounted(async () => {
-  await fetchTasks();
+  await fetchTaskboards();
 
-  socket.on('taskboard-added', async (newTask) => {
-    console.log(newTask, 'newTask')
+  socket.on('taskboard-added', async (newTaskboard) => {
+    console.log(newTaskboard, 'newTask')
     console.log(taskboards.value, 'value taskboards')
-    taskboards.value.push(newTask);
+    taskboards.value.push(newTaskboard);
   });
 
   socket.on('taskboard-removed', async (taskId) => {
@@ -82,7 +82,7 @@ onMounted(async () => {
 
 })
 
-async function fetchTasks() {
+async function fetchTaskboards() {
   try {
     const token = document.cookie.match('token=([^;]+)');
     const requestOptions = {
@@ -115,10 +115,11 @@ async function fetchTasks() {
      
     <ul>
       <li v-for="item in taskboards" :key="item.id">  
-        {{ item.name}}      
+      <router-link :to="{ name: 'Taskboard', params: { id: item.id }, props: { taskboardName: item.name }  }"><span>{{ item.name}} </span></router-link>
         <button v-if="item.creatorId == userId" type="button" class="btn-close btn-close-white" aria-label="Close" @click="deleteTask(item.id)"></button>
       </li>
     </ul>
+
      <input autofocus placeholder="Taskboard title..." id='inptBtn' v-model="taskboard.name">
       <button @click="addTaskboard(taskboard.name)" id="addBtn">Add Taskboard</button>     
     <router-link to="/">

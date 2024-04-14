@@ -129,9 +129,9 @@ app.post('/api/taskboards', router, async (req, res, next) => {
     
     const name = req.body.name
     console.log(name, creatorId, 'taskboard creation')
-    const task = await db.TaskBoard.create({name, creatorId});
-    req.io.emit('taskboard-added', task);
-    res.json(task);
+    const taskboard = await db.TaskBoard.create({name, creatorId});
+    req.io.emit('taskboard-added', taskboard);
+    res.json(taskboard);
   } catch (error) {
     next(error);
   }
@@ -140,8 +140,8 @@ app.post('/api/taskboards', router, async (req, res, next) => {
 // PUT METHOD API URL | UPDATE ITEM
 app.put('/api/taskboards', router, async (req, res, next) => {
   try {
-    const task = await db.TaskBoard.update(req.body);
-    res.json(task);
+    const taskboard = await db.TaskBoard.update(req.body);
+    res.json(taskboard);
   } catch (error) {
     next(error);
   }
@@ -204,6 +204,42 @@ app.post('/api/sign-in', async (req, res, next) => {
       
 
 
+  } catch (error) {
+    next(error);
+  }
+});
+
+
+
+app.post('/api/tasks', router, async (req, res, next) => {
+  try {
+    console.log(req.body, 'req_body')
+    console.log(req.body.taskboardId, 'tasboard ID')
+    const tasks = await db.Task.findAll({where: {
+      taskboard_id: req.body.taskboardId
+    }});
+    console.log(tasks, 'tasks found')
+    const taskboard = await db.TaskBoard.findOne({where:
+    {
+      id: req.body.taskboardId
+    }})
+    console.log(taskboard, 'taskboard found')
+    res.json( {tasks, userId: req.decodedToken.id, taskboardName: taskboard.name });
+  } catch (error) {
+    next(error);
+  }
+});
+
+app.post('/api/tasks', router, async (req, res, next) => {
+  try {
+    console.log(req.decodedToken)
+    const creatorId = req.decodedToken['id'] 
+    
+    const name = req.body.name
+    console.log(name, creatorId, 'taskboard creation')
+    const task = await db.Task.create({taskboardId, title, description, dueDate, assigneeId });
+    req.io.emit('task-added', task);
+    res.json(task);
   } catch (error) {
     next(error);
   }

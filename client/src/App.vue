@@ -1,6 +1,4 @@
-<script setup>
-import HeaderComponent from './components/HeaderComponent.vue'
-</script>
+
 
 <template>
   <div id="app">
@@ -47,9 +45,8 @@ body {
 
   #inptBtn {
     border-radius: 23px;
-    height: 59px;
     margin-bottom: 5%;
-    width: 89%;
+    width: 100%;
     background: transparent;
     color: white; 
   }

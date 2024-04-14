@@ -43,30 +43,43 @@ async function setupDB() {
 
         // CREATE MODEL OF tasks TABLE
         db.Task = sequelize.define('tasks', {
-          text: {
-            type: DataTypes.STRING,
-            allowNull: false
-        },
-            // id: {
-            //   type: DataTypes.INTEGER,
-            //   primaryKey: true,
-            //   autoIncrement: true,
-            // },
-            // title: {
-            //   type: DataTypes.STRING(255),
-            //   allowNull: false,
-            // },
-            // description: {
-            //   type: DataTypes.TEXT,
-            // },
-            // status: {
-            //   type: DataTypes.INTEGER,
-            //   allowNull: false,
-            // },
-            // due_date: {
-            //   type: DataTypes.DATE,
-            // },
+        
+            id: {
+              type: DataTypes.INTEGER,
+              primaryKey: true,
+              autoIncrement: true,
+            },
+            taskboard_id: {
+              type: DataTypes.INTEGER,
+              allowNull: false,
+            },
+            title: {
+              type: DataTypes.STRING(255),
+              allowNull: false,
+            },
+            description: {
+              type: DataTypes.TEXT,
+            },
+            status: {
+              type: DataTypes.INTEGER,
+              allowNull: false,
+            },
+            due_date: {
+              type: DataTypes.STRING, // STRING FOR TEST, CHANGE TO DATE
+            },
+            assignee_id: {
+              type: DataTypes.INTEGER,
+              allowNull: false,
+            },
           });
+
+          db.Task.beforeCreate(async (task) => {
+  
+            task.status = 0;
+            if (!task.assignee_id) {
+              task.assignee_id = 0
+            }
+          }); 
 
         db.TaskBoard = sequelize.define('task_boards', {
             id: {

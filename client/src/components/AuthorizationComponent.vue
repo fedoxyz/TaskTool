@@ -4,7 +4,6 @@ import { useRouter } from 'vue-router';
 
 const router = useRouter();
 
-const isSignedIn = ref(false)
 const isSignIn = ref(true)
 const data = reactive({
     isMessage: false,
