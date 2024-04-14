@@ -95,16 +95,16 @@ watch(data, (newValue, oldValue) => {
     <div class="form">
     <div class='signin-tab' v-if='isSignIn'>
     <h2>Sign in</h2>
-    <input autofocus placeholder="E-mail" id='inptBtn' v-model='user.email'>
-    <input placeholder="Password" id='inptBtn' v-model='user.password' >
+    <input autofocus placeholder="E-mail" id='input' v-model='user.email'>
+    <input placeholder="Password" id='input' v-model='user.password' >
      <button @click="SignIn()" style="margin: 23px; width: 24%;">Sign In</button>
      <button @click="switchTab()" style="margin: 23px; width: 24%;">Sign Up</button>
     </div>
     <div class='signup-tab' v-else>
     <h2>Sign Up</h2>
-    <input autofocus placeholder="Username" id='inptBtn' v-model='user.username'>
-    <input placeholder="E-mail" id='inptBtn' v-model='user.email'>
-    <input placeholder="Password" id='inptBtn' v-model='user.password'>
+    <input autofocus placeholder="Username" id='input' v-model='user.username'>
+    <input placeholder="E-mail" id='input' v-model='user.email'>
+    <input placeholder="Password" id='input' v-model='user.password'>
       <button @click="SignUp()" style="margin: 23px; width: 24%;">Sign Up</button>
       <button @click="switchTab()" style="margin: 23px; width: 24%;">Sign In</button>
     </div>
@@ -136,15 +136,5 @@ h2 {
   font-family: system-ui;
   color: white;
 }
-button {
-    width: 50%;
-    border: 1px solid white !important;
-    padding: 10px;
-    background-color: transparent;
-    color: white;
-    border: none;
-    padding: 12px;
-    border-radius: 12px;
-    cursor: pointer;
-  }
+
 </style>

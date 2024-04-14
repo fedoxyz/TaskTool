@@ -31,15 +31,6 @@ h2 {
   font-family: system-ui;
   color: white;
 }
-button {
-    width: 50%;
-    border: 1px solid white !important;
-    padding: 10px;
-    background-color: transparent;
-    color: white;
-    border: none;
-    padding: 12px;
-    border-radius: 12px;
-    cursor: pointer;
-  }
+
+
 </style>

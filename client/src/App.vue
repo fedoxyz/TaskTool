@@ -13,10 +13,10 @@
   display: block;
   width: 100%;
   margin: 0 auto;
-  margin-bottom: 23px;
   padding: 0rem;
   font-weight: normal;
   text-align: center;
+   min-height: 100vh;
 }
 
 header {
@@ -29,8 +29,8 @@ body {
   display: flex;
   justify-content: center;
   align-items: center;
-  height: 100vh;
   margin: 0;
+  color: #fff;
 }
 
  input {
@@ -40,21 +40,24 @@ body {
     color: black; 
   }
 
-
-
-
-  #inptBtn {
+  #input {
     border-radius: 23px;
-    margin-bottom: 5%;
     width: 100%;
     background: transparent;
     color: white; 
   }
 
 
-  #addBtn {
-    width: 50%;
+
+
+  button {
+    border-radius: 23px;
+    width: 100%;
+    background: transparent;
+    color: white; 
+    width: 33%;
     border: 1px solid white !important;
+    padding: 10px;
   }
 
 
@@ -89,6 +92,10 @@ body {
     color: red;
   }
 
+#button {
+      margin-left: 3.5%;
+    margin-right: 3.5%;
+}
 
 
 </style>

@@ -110,21 +110,33 @@ async function fetchTaskboards() {
 </script>
 
 <template>
-  <div id="container" style="text-align: center; display: inline-block; width: 49%;"> 
+  <div class='container' style="text-align: center; display: inline-block;"> 
+  <div class='taskboards-wrapper'>
 <h1>Taskboards</h1>
      
     <ul>
       <li v-for="item in taskboards" :key="item.id">  
-      <router-link :to="{ name: 'Taskboard', params: { id: item.id }, props: { taskboardName: item.name }  }"><span>{{ item.name}} </span></router-link>
+      <router-link :to="{ name: 'Taskboard', params: { id: item.id }, props: { taskboardName: item.name }  }"><div>{{ item.name}} </div></router-link>
         <button v-if="item.creatorId == userId" type="button" class="btn-close btn-close-white" aria-label="Close" @click="deleteTask(item.id)"></button>
       </li>
     </ul>
 
-     <input autofocus placeholder="Taskboard title..." id='inptBtn' v-model="taskboard.name.value">
-      <button @click="addTaskboard(taskboard.name.value)" id="addBtn">Add Taskboard</button>     
+     <!-- <input autofocus placeholder="Taskboard title..." id='input' v-model="taskboard.name.value">
+      <button @click="addTaskboard(taskboard.name.value)" id="addBtn">Add Taskboard</button> -->
+       <input autofocus placeholder="Taskboard title..." id='input' v-model="taskboard.name.value">
+       <div class='controls'>
+    <!-- <button id='button' @click="taskboardToggle()" >Add Taskboard</button> -->
+   
+    <button @click="addTaskboard(taskboard.name.value)" id="button">Add Taskboard</button>
+    <router-link to='/'>
+         <button id='button'>Back to Home</button>
+        </router-link>
+         
+        </div>
     <router-link to="/">
-        <button style="width: 157px;">Back to Home</button>
+        
     </router-link>
+    </div>
   </div>
 </template>
 
@@ -154,6 +166,13 @@ async function fetchTaskboards() {
     padding-bottom: 34px;
     background-color: transparent;
   }
+.controls {
+    
+    margin: 0% 0px 3% 0px
+}
 
+#button {
+  margin-top: 10px;
+}
  
 </style>

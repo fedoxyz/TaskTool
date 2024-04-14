@@ -4,8 +4,10 @@
      <div class="row align-items-start">
      <div v-if="isTasksToggled" class='tasks-tab'>
 <h1>{{taskboardName}}</h1>
- <div class="col">
-      <div class="task" v-for="task in todo" :key="task.id">
+<div class='d-flex'>
+ <div class="col" id='column'>
+ <h3 class='column-title' >To Do</h3>
+      <div class="task d-flex align-self-left"  v-for="task in todo" :key="task.id">
         <!-- <router-link
           :to="{ name: 'Task', params: { id: task.id }, props: { task } }"
         > -->
@@ -13,8 +15,9 @@
         <!-- </router-link> -->
       </div>
     </div>
-    <div class="col">
-       <div class="task" v-for="task in progress" :key="task.id">
+    <div class="col" id='column'>
+    <h3 class='column-title'>In Progress</h3>
+       <div class="task d-flex align-self-left" v-for="task in progress" :key="task.id">
         <!-- <router-link
           :to="{ name: 'Task', params: { id: task.id }, props: { task } }"
         > -->
@@ -22,8 +25,9 @@
         <!-- </router-link> -->
       </div>
     </div>
-    <div class="col">
-      <div class="task" v-for="task in completed" :key="task.id">
+    <div class="col" id='column'>
+    <h3 class='column-title' >Completed</h3>
+      <div class="task d-flex align-self-left" v-for="task in completed" :key="task.id">
         <!-- <router-link
           :to="{ name: 'Task', params: { id: task.id }, props: { task } }"
         > -->
@@ -31,23 +35,26 @@
         <!-- </router-link> -->
       </div>
     </div>
-    <button @click="taskToggle()" id="addBtn">Add Task</button>
+    </div>
+    <div class='controls'>
+    <button id='button' @click="taskToggle()" >Add Task</button>
     <router-link to='/app'>
-          <button id="addBtn">Back</button>
+          <button id='button' >Back</button>
         </router-link>
+        </div>
     
   </div>
 
 
   <div v-if="!isTasksToggled" class="add-tab">
-  <input placeholder="Title..." id='inptBtn' v-model='task.title.value' >
-  <input placeholder="Description..." id='inptBtn' v-model='task.description.value' >
-  <input placeholder="Due date..." id='inptBtn' v-model='task.dueDate.value' >
-  <input placeholder="Assignee name..." id='inptBtn' v-model='task.assigneeName.value' >
+  <input placeholder="Title..." id='input' v-model='task.title.value' >
+  <input placeholder="Description..." id='input' v-model='task.description.value' >
+  <input placeholder="Due date..." id='input' v-model='task.dueDate.value' >
+  <input placeholder="Assignee name..." id='input' v-model='task.assigneeName.value' >
   
   <div class='controls'>
-  <button @click="addTask()" id="addBtn">Add Task</button>
-  <button @click="taskToggle()" id="addBtn">Back</button>
+  <button @click="addTask()" id='button'>Add Task</button>
+  <button @click="taskToggle()" id='button'>Back</button>
   <div v-if="data.isMessage.value" :class="{ error: data.isError.value, message: true }">{{data.message.value}}</div>
   </div>
   </div>
@@ -195,3 +202,22 @@ const completed = computed(() => {
 })
 
 </script>
+
+<style>
+.controls {
+    
+    margin: 3% 0px 3% 0px
+}
+.task {
+    padding: 7px 10px 7px 10px
+}
+
+.column-title {
+    margin: 0;
+     border-bottom: 1px solid #ccc;
+    padding: 10px 0px 10px 0px;
+}
+#column {
+     border: 1px solid #ccc;
+}
+</style>
