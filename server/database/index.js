@@ -113,7 +113,8 @@ async function setupDB() {
           });
 
 
-        await sequelize.sync({force: true});
+        // await sequelize.sync({force: true});
+        await sequelize.sync({force: false});
         
         // await db.<ModelName>.create({ <key: "value"> }); // THIS CREATES ENTRIES
     } catch (error) {

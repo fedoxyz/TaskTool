@@ -235,11 +235,31 @@ app.post('/api/tasks', router, async (req, res, next) => {
     console.log(req.decodedToken)
     const creatorId = req.decodedToken['id'] 
     console.log(req.body, 'req body on tasks')
-    const task = await db.Task.create({taskboard_id: req.body.taskboard_id, title: req.body.title, description: req.body.description, due_date: req.body.due_data, assignee_id:req.body.assignee_id, creator_id: creatorId });
+    var assigneeId = null;
+
+    if (req.body.assigneeName) {
+    try {
+      console.log(req.body.assigneeName)
+      const assigneeUser = await db.User.findOne({where: {username: req.body.assigneeName}})
+      assigneeId = assigneeUser.id;
+    } catch {
+      throw Error('UserNotFound')
+    }
+  }
+    console.log('if user not found dont go here')
+    const task = await db.Task.create({taskboard_id: req.body.taskboard_id, title: req.body.title, description: req.body.description, due_date: req.body.due_date.value, assignee_id: assigneeId, creator_id: creatorId });
     req.io.emit('task-added', task);
     res.json(task);
   } catch (error) {
-    next(error);
+    console.log(error.message, 'nmessage')
+      if (error.message === 'UserNotFound') {
+        console.log('wwe hererer')
+        res.status(401).json(error.message)
+      } else {
+        next(error);
+      }
+      
+    
   }
 });
 

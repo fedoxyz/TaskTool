@@ -6,9 +6,9 @@ import { useRouter } from 'vue-router';
 const router = useRouter();
 
 const taskboard = reactive({
-  id: null,
-  name: '',
-  creatorId: null
+  id: {type: Number, value: null},
+  name: {type: String, value: ''},
+  creatorId: {type: Number, value: null},
 })
 
 const userId = ref(0)
@@ -120,8 +120,8 @@ async function fetchTaskboards() {
       </li>
     </ul>
 
-     <input autofocus placeholder="Taskboard title..." id='inptBtn' v-model="taskboard.name">
-      <button @click="addTaskboard(taskboard.name)" id="addBtn">Add Taskboard</button>     
+     <input autofocus placeholder="Taskboard title..." id='inptBtn' v-model="taskboard.name.value">
+      <button @click="addTaskboard(taskboard.name.value)" id="addBtn">Add Taskboard</button>     
     <router-link to="/">
         <button style="width: 157px;">Back to Home</button>
     </router-link>

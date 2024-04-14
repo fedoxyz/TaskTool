@@ -32,10 +32,11 @@
       </div>
     </div>
   </div>
-  <input placeholder="Title..." id='inptBtn' v-model='task.title' >
-  <input placeholder="Description..." id='inptBtn' v-model='task.description' >
-  <input placeholder="Due date..." id='inptBtn' v-model='task.dueDate' >
-  <input placeholder="Assignee name..." id='inptBtn' v-model='task.assigneeName' >
+  <input placeholder="Title..." id='inptBtn' v-model='task.title.value' >
+  <input placeholder="Description..." id='inptBtn' v-model='task.description.value' >
+  <input placeholder="Due date..." id='inptBtn' v-model='task.dueDate.value' >
+  <input placeholder="Assignee name..." id='inptBtn' v-model='task.assigneeName.value' >
+  <span v-if="data.isMessage.value" :class="{ error: data.isError.value }">{{data.message.value}}</span>
   <button @click="addTask()" id="addBtn">Add Taskboard</button>  
   </div>
 
@@ -53,10 +54,15 @@ const task = reactive({
     taskboardId: { type: Number, value: route.params.id },
     title: { type: String, value: '' },
     description: { type: String, value: '' },
-    dueData: { type: String, value: '' },
+    dueDate: { type: String, value: '' },
     assigneeId: { type: Number, value: 0 },
+    assigneeName: { type: String, value: '' }
 })
-// const taskboardId = ref(route.params.id)
+const data = reactive({
+    isMessage: { type: Boolean, value: 0 },
+    isError: { type: Boolean, value: 0 },
+    message: { type: String, value: '' },
+})
 const taskboardName = ref()
 
 const tasks = ref([])
@@ -82,6 +88,7 @@ const tasks = ref([])
 
  // FETCH TASKS FROM REQUESTED TASKBOARD ON MOUNT
 async function fetchTasks(){
+   
     try {
     console.log(task.taskboardId.value, 'taskboard value')
     const token = document.cookie.match('token=([^;]+)');
@@ -120,17 +127,34 @@ async function addTask() {
         headers: { 'Content-Type': 'application/json',
       'Authorization': `${token[1]}`,
       },
-      body: JSON.stringify({ taskboard_id: task.taskboardId.value, title: task.title, description: task.description, due_data: task.dueData.value, assignee_id: task.assigneeId.value })
+      body: JSON.stringify({ taskboard_id: task.taskboardId.value, title: task.title.value, description: task.description.value, due_date: task.dueDate, assigneeName: task.assigneeName.value })
       };
     console.log(requestOptions, 'requestedOptions')
+    
     const response = await fetch(`${import.meta.env.VITE_API_HOST}:${import.meta.env.VITE_API_PORT}/api/tasks`, requestOptions)
+    console.log(response, 'response')
+   const jsonResponse = await response.json()
+   console.log(jsonResponse, 'json response when adding task')
      if (!response.ok) {
+        console.log('response not ok')
+         console.log(jsonResponse)
+    if (jsonResponse === 'UserNotFound') {
+        data.isMessage.value = true
+        data.isError.value = true
+        data.message.value = `User with username ${task.assigneeName.value} not found`
+        return
+    }
       console.error("Failed", response.statusText);
       router.push('/auth');
+      console.log(response, 'response')
     }
+    data.isMessage.value = true
+    data.isError.value = false
+    data.message.value = `Task ${task.title.value} successfully created`
     task.value = {taskboardId: null, title: '', description: '', dueData: '', assigneeId: null};
   } catch (error) {
-    console.lop('123123')
+    console.log('123123')
+    console.log('123123')
     router.push('/auth');
     console.error(error);
   }
