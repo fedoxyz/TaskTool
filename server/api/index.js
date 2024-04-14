@@ -50,7 +50,8 @@ router.use(async (req, res, next) => {
     return res.status(403).json({ error: 'No credentials sent!' });
     }
     const token = req.headers.authorization.split(' ')[1];
-    jwt.verify(token, process.env.JWT_KEY);
+    const decodedToken = jwt.verify(token, process.env.JWT_KEY);
+    req.decodedToken = decodedToken;
     next();
   
   } catch (error) {
@@ -110,20 +111,26 @@ app.put('/api/users', async (req, res, next) => {
 });
 
 // GET METHOD API URL | RETRIEVE ITEMS
-app.get('/api/tasks', router, async (req, res, next) => {
+app.get('/api/taskboards', router, async (req, res, next) => {
   try {
-    const tasks = await db.Task.findAll();
-    res.json(tasks);
+    console.log(req.decodedToken.id, 'id id id ')
+    const taskboards = await db.TaskBoard.findAll();
+    res.json( {taskboards, userId: req.decodedToken.id });
   } catch (error) {
     next(error);
   }
 });
 
 // POST METHOD API URL | CREATE ITEM
-app.post('/api/tasks', router, async (req, res, next) => {
+app.post('/api/taskboards', router, async (req, res, next) => {
   try {
-    const task = await db.Task.create(req.body);
-    req.io.emit('task-added', task);
+    console.log(req.decodedToken)
+    const creatorId = req.decodedToken['id'] 
+    
+    const name = req.body.name
+    console.log(name, creatorId, 'taskboard creation')
+    const task = await db.TaskBoard.create({name, creatorId});
+    req.io.emit('taskboard-added', task);
     res.json(task);
   } catch (error) {
     next(error);
@@ -131,9 +138,9 @@ app.post('/api/tasks', router, async (req, res, next) => {
 });
 
 // PUT METHOD API URL | UPDATE ITEM
-app.put('/api/tasks', router, async (req, res, next) => {
+app.put('/api/taskboards', router, async (req, res, next) => {
   try {
-    const task = await db.Task.update(req.body);
+    const task = await db.TaskBoard.update(req.body);
     res.json(task);
   } catch (error) {
     next(error);
@@ -141,16 +148,18 @@ app.put('/api/tasks', router, async (req, res, next) => {
 });
 
 // DELETE METHOD API URL | DELETE ITEM
-app.delete('/api/tasks/:id', router, async (req, res, next) => {
+app.delete('/api/taskboards/:id', router, async (req, res, next) => {
   console.log('we here')
   try {
-    await db.Task.destroy({
-      where: {
-        id: req.params.id
-      }
-    });
-    req.io.emit('task-removed', req.params.id);
-    res.sendStatus(204);
+    const taskboard = await db.TaskBoard.findOne({ where: { id: req.params.id } });
+    if (req.decodedToken.id === taskboard.creatorId) {
+      await db.TaskBoard.destroy({ where: { id: req.params.id } });
+      req.io.emit('taskboard-removed', req.params.id);
+      res.sendStatus(204);
+    } else {
+      console.log('error occured when deleting taskboard ')
+      next(error)
+    }
   } catch (error) {
     next(error);
   }
@@ -184,7 +193,7 @@ app.post('/api/sign-in', async (req, res, next) => {
 
   const isMatch = bcrypt.compareSync(password, user.password);
   if (isMatch) {
-    const token = jwt.sign({ email: user.email, password: user.password }, process.env.JWT_KEY);
+    const token = jwt.sign({ id: user.id ,email: user.email, password: user.password }, process.env.JWT_KEY);
     res.set('Authorization', `Bearer ${token}`);
     res.set("Access-Control-Expose-Headers","Authorization"); // for cors
       res.json({ user });

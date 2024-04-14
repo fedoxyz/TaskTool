@@ -78,6 +78,10 @@ async function setupDB() {
               type: DataTypes.STRING(100),
               allowNull: false,
             },
+            creatorId: {
+              type: DataTypes.INTEGER,
+              allowNull: false,
+            },
           });
           
         db.TaskAssignment = sequelize.define('task_assignments', {

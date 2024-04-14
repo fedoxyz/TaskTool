@@ -61,15 +61,6 @@ body {
   }
 
 
-  button {
-    padding: 10px;
-    background-color: transparent;
-    color: white;
-    border: none;
-    padding: 12px;
-    border-radius: 12px;
-    cursor: pointer;
-  }
 
   button:hover {
     background-color: #aaaaaa23;

@@ -1,11 +1,23 @@
 <script setup>
-import { onMounted, ref } from 'vue'
+import { onMounted, ref, reactive } from 'vue'
 import { socket } from '@/utils/socket'
+import { useRouter } from 'vue-router';
 
-const newTodo = ref('')
-const todos = ref([])
+const router = useRouter();
 
-async function addTask(text) {
+const taskboard = reactive({
+  id: null,
+  name: '',
+  creatorId: null
+})
+
+const userId = ref(0)
+
+const taskboards = ref([])
+
+
+async function addTaskboard(name) {
+  console.log(name, 'name in addTaskboard()')
   try {
     const token = document.cookie.match('token=([^;]+)');
     console.log(token[1], '123123')
@@ -14,13 +26,18 @@ async function addTask(text) {
         headers: { 'Content-Type': 'application/json',
       'Authorization': `${token[1]}`,
       },
-      body: JSON.stringify({ text: text })
+      body: JSON.stringify({ name })
       };
     console.log(requestOptions, 'requestedOptions')
-    const response = await fetch(`${import.meta.env.VITE_API_HOST}:${import.meta.env.VITE_API_PORT}/api/tasks`, requestOptions)
-    console.log(response)
-    newTodo.value = '';
+    const response = await fetch(`${import.meta.env.VITE_API_HOST}:${import.meta.env.VITE_API_PORT}/api/taskboards`, requestOptions)
+     if (!response.ok) {
+      console.error("Failed", response.statusText);
+      router.push('/auth');
+    }
+    taskboard.value = {id: null, name: '', creatorId: null};
   } catch (error) {
+    console.lop('123123')
+    router.push('/auth');
     console.error(error);
   }
 }
@@ -33,15 +50,14 @@ async function deleteTask(id) {
       method: "DELETE",
       headers: { 'Authorization': `${token[1]}` },
     };
-    const response = await fetch(`${import.meta.env.VITE_API_HOST}:${import.meta.env.VITE_API_PORT}/api/tasks/${id}`, requestOptions);
-
-    if (response.ok) {
-      
-      
-    } else {
+    const response = await fetch(`${import.meta.env.VITE_API_HOST}:${import.meta.env.VITE_API_PORT}/api/taskboards/${id}`, requestOptions);
+  if (!response.ok) {
       console.error("Failed", response.statusText);
+      router.push('/auth');
     }
+   
   } catch (error) {
+    router.push('/auth');
     console.error(error);
   }
 }
@@ -51,16 +67,16 @@ async function deleteTask(id) {
 onMounted(async () => {
   await fetchTasks();
 
-  socket.on('task-added', async (newTask) => {
+  socket.on('taskboard-added', async (newTask) => {
     console.log(newTask, 'newTask')
-    console.log(todos.value, 'value todos')
-    todos.value.push(newTask);
+    console.log(taskboards.value, 'value taskboards')
+    taskboards.value.push(newTask);
   });
 
-  socket.on('task-removed', async (taskId) => {
-    const index = todos.value.findIndex((t) => t.id === Number(taskId))
+  socket.on('taskboard-removed', async (taskId) => {
+    const index = taskboards.value.findIndex((t) => t.id === Number(taskId))
    if (index !== -1) {
-    todos.value.splice(index, 1)
+    taskboards.value.splice(index, 1)
   }
   });
 
@@ -73,25 +89,38 @@ async function fetchTasks() {
       method: "get",
       headers: { 'Authorization': `${token[1]}` },
     };
-    const response = await fetch(`${import.meta.env.VITE_API_HOST}:${import.meta.env.VITE_API_PORT}/api/tasks`, requestOptions);
-    todos.value = await response.json();
+    const response = await fetch(`${import.meta.env.VITE_API_HOST}:${import.meta.env.VITE_API_PORT}/api/taskboards`, requestOptions);
+    if (response.ok) {
+      
+      const jsonResponse = await response.json();
+      console.log(jsonResponse)
+      userId.value = jsonResponse.userId
+      taskboards.value = jsonResponse.taskboards
+      console.log(userId.value)
+    } else {
+      router.push('/auth');
+    }
+    
   } catch (error) {
+  console.log('1231123123123')
     console.error(error);
+    
   }
 }
 </script>
 
 <template>
   <div id="container" style="text-align: center; display: inline-block; width: 49%;"> 
-
-      <input autofocus placeholder="add your texthere" id='inptBtn' v-model="newTodo">
-      <button @click="addTask(newTodo)" id="addBtn">Add Todo</button>     
+<h1>Taskboards</h1>
+     
     <ul>
-      <li v-for="item in todos" :key="item.id">  
-        {{ item.text }}         
-        <button style='height: 39px; width: 39px; border-radius: 23px;' @click="deleteTask(item.id)">X</button>
+      <li v-for="item in taskboards" :key="item.id">  
+        {{ item.name}}      
+        <button v-if="item.creatorId == userId" type="button" class="btn-close btn-close-white" aria-label="Close" @click="deleteTask(item.id)"></button>
       </li>
     </ul>
+     <input autofocus placeholder="Taskboard title..." id='inptBtn' v-model="taskboard.name">
+      <button @click="addTaskboard(taskboard.name)" id="addBtn">Add Taskboard</button>     
     <router-link to="/">
         <button style="width: 157px;">Back to Home</button>
     </router-link>
