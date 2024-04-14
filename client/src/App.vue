@@ -81,11 +81,14 @@ body {
     background-color: transparent;
   }
 
-  span {
-    color: white;
+  .message {
+    color: #fff;
+    margin-top: 3%
   }
   .error {
     color: red;
   }
+
+
 
 </style>

@@ -2,54 +2,71 @@
  
     <div class="container">
      <div class="row align-items-start">
-    
+     <div v-if="isTasksToggled" class='tasks-tab'>
 <h1>{{taskboardName}}</h1>
  <div class="col">
       <div class="task" v-for="task in todo" :key="task.id">
-        <router-link
+        <!-- <router-link
           :to="{ name: 'Task', params: { id: task.id }, props: { task } }"
-        >
+        > -->
           {{ task.title }}
-        </router-link>
+        <!-- </router-link> -->
       </div>
     </div>
     <div class="col">
        <div class="task" v-for="task in progress" :key="task.id">
-        <router-link
+        <!-- <router-link
           :to="{ name: 'Task', params: { id: task.id }, props: { task } }"
-        >
+        > -->
           {{ task.title }}
-        </router-link>
+        <!-- </router-link> -->
       </div>
     </div>
     <div class="col">
       <div class="task" v-for="task in completed" :key="task.id">
-        <router-link
+        <!-- <router-link
           :to="{ name: 'Task', params: { id: task.id }, props: { task } }"
-        >
+        > -->
           {{ task.title }}
-        </router-link>
+        <!-- </router-link> -->
       </div>
     </div>
+    <button @click="taskToggle()" id="addBtn">Add Task</button>
+    <router-link to='/app'>
+          <button id="addBtn">Back</button>
+        </router-link>
+    
   </div>
+
+
+  <div v-if="!isTasksToggled" class="add-tab">
   <input placeholder="Title..." id='inptBtn' v-model='task.title.value' >
   <input placeholder="Description..." id='inptBtn' v-model='task.description.value' >
   <input placeholder="Due date..." id='inptBtn' v-model='task.dueDate.value' >
   <input placeholder="Assignee name..." id='inptBtn' v-model='task.assigneeName.value' >
-  <span v-if="data.isMessage.value" :class="{ error: data.isError.value }">{{data.message.value}}</span>
-  <button @click="addTask()" id="addBtn">Add Taskboard</button>  
+  
+  <div class='controls'>
+  <button @click="addTask()" id="addBtn">Add Task</button>
+  <button @click="taskToggle()" id="addBtn">Back</button>
+  <div v-if="data.isMessage.value" :class="{ error: data.isError.value, message: true }">{{data.message.value}}</div>
   </div>
+  </div>
+ </div>
+</div>
 
 </template>
 
 <script setup>
-import {onMounted, ref, reactive} from 'vue'
+import {onMounted, ref, reactive, computed} from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { socket } from '@/utils/socket'
+
 
 const router = useRouter()
 const route = useRoute()
 console.log(route, 'route')
+
+const isTasksToggled = ref({type: Boolean, value: true})
 const task = reactive({
     taskboardId: { type: Number, value: route.params.id },
     title: { type: String, value: '' },
@@ -63,16 +80,17 @@ const data = reactive({
     isError: { type: Boolean, value: 0 },
     message: { type: String, value: '' },
 })
-const taskboardName = ref()
+const taskboardName = ref({type: String, value: ''})
 
 const tasks = ref([])
+//const tasks = ref({type: Array, value: []})
 
  onMounted(async () => {
   await fetchTasks();
 
   socket.on('task-added', async (newTask) => {
     console.log(newTask, 'newTask')
-    console.log(tasks.value, 'value taskboards')
+    console.log(tasks, 'value taskboards')
     tasks.value.push(newTask);
   });
 
@@ -85,6 +103,9 @@ const tasks = ref([])
 
 })
 
+function taskToggle() {
+    isTasksToggled.value = !isTasksToggled.value 
+}
 
  // FETCH TASKS FROM REQUESTED TASKBOARD ON MOUNT
 async function fetchTasks(){
@@ -105,8 +126,9 @@ async function fetchTasks(){
       const jsonResponse = await response.json();
       console.log(jsonResponse, 'jsonResponse');
       tasks.value = jsonResponse.tasks;
+      console.log(tasks.value, 'tasks.value')
       taskboardName.value = jsonResponse.taskboardName
-      console.log(tasks.value);
+      console.log(tasks);
     } else {
       router.push('/auth');
     }
@@ -159,5 +181,17 @@ async function addTask() {
     console.error(error);
   }
 }
+
+const todo = computed(() => {
+  return tasks.value.filter((task) => task.status === 0)
+})
+
+const progress = computed(() => {
+  return tasks.value.filter((task) => task.status === 1)
+})
+
+const completed = computed(() => {
+  return tasks.value.filter((task) => task.status === 2)
+})
 
 </script>
