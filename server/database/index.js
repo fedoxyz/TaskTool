@@ -71,6 +71,10 @@ async function setupDB() {
               type: DataTypes.INTEGER,
               allowNull: true,
             },
+            creator_id: {
+              type: DataTypes.INTEGER,
+              allowNull: false,
+            },
           });
 
           db.Task.beforeCreate(async (task) => {

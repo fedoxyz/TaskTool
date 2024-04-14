@@ -42,7 +42,7 @@
 </template>
 
 <script setup>
-import {onMounted, ref, reactive, defineProps} from 'vue'
+import {onMounted, ref, reactive} from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { socket } from '@/utils/socket'
 
@@ -50,25 +50,16 @@ const router = useRouter()
 const route = useRoute()
 console.log(route, 'route')
 const task = reactive({
-    taskboardId: { type: Number, value: 0 },
+    taskboardId: { type: Number, value: route.params.id },
     title: { type: String, value: '' },
     description: { type: String, value: '' },
     dueData: { type: String, value: '' },
     assigneeId: { type: Number, value: 0 },
 })
-const taskboardId = ref(route.params.id)
+// const taskboardId = ref(route.params.id)
 const taskboardName = ref()
 
 const tasks = ref([])
- // NEED INITIALIZE PROPS
-// const props = defineProps({
-//   taskboardName: {
-//     type: String,
-//     required: true
-//   }
-// })
-
-
 
  onMounted(async () => {
   await fetchTasks();
@@ -92,14 +83,14 @@ const tasks = ref([])
  // FETCH TASKS FROM REQUESTED TASKBOARD ON MOUNT
 async function fetchTasks(){
     try {
-    console.log(taskboardId.value, 'taskboard value')
+    console.log(task.taskboardId.value, 'taskboard value')
     const token = document.cookie.match('token=([^;]+)');
 
     
     const requestOptions = {
       method: "POST",
       headers: { 'Content-Type': 'application/json', 'Authorization': `${token[1]}` },
-      body: JSON.stringify({ taskboardId: taskboardId.value })
+      body: JSON.stringify({ taskboardId: task.taskboardId.value})
     };
     console.log(requestOptions, 'requestOptions')
     const response = await fetch(`${import.meta.env.VITE_API_HOST}:${import.meta.env.VITE_API_PORT}/api/get-tasks`, requestOptions);

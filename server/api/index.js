@@ -235,7 +235,7 @@ app.post('/api/tasks', router, async (req, res, next) => {
     console.log(req.decodedToken)
     const creatorId = req.decodedToken['id'] 
     console.log(req.body, 'req body on tasks')
-    const task = await db.Task.create({taskboard_id: req.body.taskboard_id, title: req.body.title, description: req.body.description, due_date: req.body.due_data, assignee_id:req.body.assignee_id });
+    const task = await db.Task.create({taskboard_id: req.body.taskboard_id, title: req.body.title, description: req.body.description, due_date: req.body.due_data, assignee_id:req.body.assignee_id, creator_id: creatorId });
     req.io.emit('task-added', task);
     res.json(task);
   } catch (error) {
