@@ -211,7 +211,7 @@ app.post('/api/sign-in', async (req, res, next) => {
 
 
 
-app.post('/api/tasks', router, async (req, res, next) => {
+app.post('/api/get-tasks', router, async (req, res, next) => {
   try {
     console.log(req.body, 'req_body')
     console.log(req.body.taskboardId, 'tasboard ID')
@@ -234,10 +234,8 @@ app.post('/api/tasks', router, async (req, res, next) => {
   try {
     console.log(req.decodedToken)
     const creatorId = req.decodedToken['id'] 
-    
-    const name = req.body.name
-    console.log(name, creatorId, 'taskboard creation')
-    const task = await db.Task.create({taskboardId, title, description, dueDate, assigneeId });
+    console.log(req.body, 'req body on tasks')
+    const task = await db.Task.create({taskboard_id: req.body.taskboard_id, title: req.body.title, description: req.body.description, due_date: req.body.due_data, assignee_id:req.body.assignee_id });
     req.io.emit('task-added', task);
     res.json(task);
   } catch (error) {

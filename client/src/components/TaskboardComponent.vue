@@ -36,6 +36,7 @@
   <input placeholder="Description..." id='inptBtn' v-model='task.description' >
   <input placeholder="Due date..." id='inptBtn' v-model='task.dueDate' >
   <input placeholder="Assignee name..." id='inptBtn' v-model='task.assigneeName' >
+  <button @click="addTask()" id="addBtn">Add Taskboard</button>  
   </div>
 
 </template>
@@ -48,9 +49,15 @@ import { socket } from '@/utils/socket'
 const router = useRouter()
 const route = useRoute()
 console.log(route, 'route')
-const task = reactive({})
+const task = reactive({
+    taskboardId: { type: Number, value: 0 },
+    title: { type: String, value: '' },
+    description: { type: String, value: '' },
+    dueData: { type: String, value: '' },
+    assigneeId: { type: Number, value: 0 },
+})
 const taskboardId = ref(route.params.id)
-const taskboardName = ref(0)
+const taskboardName = ref()
 
 const tasks = ref([])
  // NEED INITIALIZE PROPS
@@ -95,7 +102,7 @@ async function fetchTasks(){
       body: JSON.stringify({ taskboardId: taskboardId.value })
     };
     console.log(requestOptions, 'requestOptions')
-    const response = await fetch(`${import.meta.env.VITE_API_HOST}:${import.meta.env.VITE_API_PORT}/api/tasks`, requestOptions);
+    const response = await fetch(`${import.meta.env.VITE_API_HOST}:${import.meta.env.VITE_API_PORT}/api/get-tasks`, requestOptions);
     if (response.ok) {
       const jsonResponse = await response.json();
       console.log(jsonResponse, 'jsonResponse');
@@ -112,5 +119,30 @@ async function fetchTasks(){
     
   }
 } 
+async function addTask() {
+    
+  try {
+    const token = document.cookie.match('token=([^;]+)');
+    console.log(token[1], '123123')
+    const requestOptions = {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json',
+      'Authorization': `${token[1]}`,
+      },
+      body: JSON.stringify({ taskboard_id: task.taskboardId.value, title: task.title, description: task.description, due_data: task.dueData.value, assignee_id: task.assigneeId.value })
+      };
+    console.log(requestOptions, 'requestedOptions')
+    const response = await fetch(`${import.meta.env.VITE_API_HOST}:${import.meta.env.VITE_API_PORT}/api/tasks`, requestOptions)
+     if (!response.ok) {
+      console.error("Failed", response.statusText);
+      router.push('/auth');
+    }
+    task.value = {taskboardId: null, title: '', description: '', dueData: '', assigneeId: null};
+  } catch (error) {
+    console.lop('123123')
+    router.push('/auth');
+    console.error(error);
+  }
+}
 
 </script>

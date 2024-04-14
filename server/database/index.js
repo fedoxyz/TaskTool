@@ -62,14 +62,14 @@ async function setupDB() {
             },
             status: {
               type: DataTypes.INTEGER,
-              allowNull: false,
+              allowNull: true,
             },
             due_date: {
               type: DataTypes.STRING, // STRING FOR TEST, CHANGE TO DATE
             },
             assignee_id: {
               type: DataTypes.INTEGER,
-              allowNull: false,
+              allowNull: true,
             },
           });
 
