@@ -7,32 +7,21 @@
 <div class='d-flex'>
  <div class="col" id='column'>
  <h3 class='column-title' >To Do</h3>
-      <div class="task d-flex align-self-left"  v-for="task in todo" :key="task.id">
-        <!-- <router-link
-          :to="{ name: 'Task', params: { id: task.id }, props: { task } }"
-        > -->
-          {{ task.title }}
-        <!-- </router-link> -->
+      <div class="task d-flex align-self-left" :class="{selected: selectedTask == task.id}"  v-for="task in todo" :key="task.id" @dblclick="taskShow(task.id)" ><div class='task-wrapper' @click="taskSelect(task.id)"> {{ task.title }}</div>
+      
       </div>
     </div>
     <div class="col" id='column'>
     <h3 class='column-title'>In Progress</h3>
-       <div class="task d-flex align-self-left" v-for="task in progress" :key="task.id">
-        <!-- <router-link
-          :to="{ name: 'Task', params: { id: task.id }, props: { task } }"
-        > -->
-          {{ task.title }}
-        <!-- </router-link> -->
+     <div v-if="data.isMessage.value" :class="{ error: data.isError.value, message: true }">{{data.message.value}}</div>
+       <div class="task d-flex align-self-left" :class="{selected: selectedTask == task.id}"  v-for="task in progress" :key="task.id" @dblclick="taskShow(task.id)" ><div class='task-wrapper' @click="taskSelect(task.id)"> {{ task.title }}</div>
+ 
       </div>
     </div>
     <div class="col" id='column'>
     <h3 class='column-title' >Completed</h3>
-      <div class="task d-flex align-self-left" v-for="task in completed" :key="task.id">
-        <!-- <router-link
-          :to="{ name: 'Task', params: { id: task.id }, props: { task } }"
-        > -->
-          {{ task.title }}
-        <!-- </router-link> -->
+      <div class="task d-flex align-self-left" :class="{selected: selectedTask == task.id}"  v-for="task in completed" :key="task.id" @dblclick="taskShow(task.id)" ><div class='task-wrapper' @click="taskSelect(task.id)"> {{ task.title }}</div>
+ 
       </div>
     </div>
     </div>
@@ -89,6 +78,8 @@ const data = reactive({
 })
 const taskboardName = ref({type: String, value: ''})
 
+const selectedTask = ref({type: Number, value: 0 })
+
 const tasks = ref([])
 //const tasks = ref({type: Array, value: []})
 
@@ -112,6 +103,17 @@ const tasks = ref([])
 
 function taskToggle() {
     isTasksToggled.value = !isTasksToggled.value 
+}
+
+function taskShow() {
+  console.log('DOUBLE CLICK')
+    // isTasksToggled.value = !isTasksToggled.value 
+}
+
+function taskSelect(id) {
+  console.l
+  selectedTask.value = id
+  console.log(selectedTask.value, 'selected task value')
 }
 
  // FETCH TASKS FROM REQUESTED TASKBOARD ON MOUNT
@@ -209,7 +211,8 @@ const completed = computed(() => {
     margin: 3% 0px 3% 0px
 }
 .task {
-    padding: 7px 10px 7px 10px
+     user-select: none;
+    cursor: pointer;
 }
 
 .column-title {
@@ -219,5 +222,15 @@ const completed = computed(() => {
 }
 #column {
      border: 1px solid #ccc;
+}
+
+.task.selected {
+  background-color: #55166a9e;
+}
+
+.task-wrapper {
+  padding: 7px 10px 7px 10px;
+  flex-grow: 1;
+  text-align: left;
 }
 </style>
