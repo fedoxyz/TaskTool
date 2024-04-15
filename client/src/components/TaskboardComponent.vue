@@ -163,6 +163,7 @@ return
         progress.value.splice(taskIndex, 1)
         return
       } else {
+        taskIndex = completed.value.findIndex((t) => t.id === Number(taskUpdated.id))
         completed.value.splice(taskIndex, 1)
         return
       }
@@ -194,6 +195,7 @@ return
         todo.value.splice(taskIndex, 1)
         return
       } else {
+        taskIndex = completed.value.findIndex((t) => t.id === Number(taskUpdated.id))
         completed.value.splice(taskIndex, 1)
         return
       }
@@ -209,6 +211,7 @@ return
         todo.value.splice(taskIndex, 1)
         return
       } else {
+        console.log(taskIndex, 'task index in progress')
         taskIndex = progress.value.findIndex((t) => t.id === Number(taskUpdated.id))
         if (taskIndex !== -1) { 
         console.log(taskIndex, 'splice completed')
@@ -218,13 +221,17 @@ return
         return
       } }
   } else  {
+    console.log(taskUpdated, 'we here ')
     completed.value.push(taskUpdated)
     taskIndex = todo.value.findIndex((t) => t.id === Number(taskUpdated.id))
+    console.log(taskIndex, 'task index in here ')
     if (taskIndex !== -1) { 
         todo.value.splice(taskIndex, 1)
         return
       } else {
+        taskIndex = progress.value.findIndex((t) => t.id === Number(taskUpdated.id))
         progress.value.splice(taskIndex, 1)
+        console.log(progress.value)
         return
       }
   }
