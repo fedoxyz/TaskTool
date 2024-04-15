@@ -7,23 +7,10 @@
 <div class='d-flex'>
  <div class="col" id='column'>
  <h3 class='column-title' >To Do</h3>
-      <!-- <div tag='div' class="task d-flex align-self-left" :class="{selected: selectedTask == task.id}"  v-for="task in todo" :key="task.id" @dblclick="taskShow(task.id)" ><div class='task-wrapper' @click="taskSelect(task.id)"> {{ task.title }}</div>
-      
-      </div> -->
-
-
-       <!-- <draggable v-model="todo" tag="ul" group="tasks">
-    <template #item="{ element: task }">
-      <li>{{ task }}</li>
-    </template>
-  </draggable> -->
-
-
-
-       <draggable  item-key="id" :animation="300" v-model="todo" tag="ul" group='tasks' id='tasks'>
+       <draggable @end='checkMove' class="tasks"  item-key="id" :animation="300" :list="todo" tag="ul" group='tasks' id='0'>
     <template #item="{ element: task }">
       <li id='task'>
-      <div :move="onMoveCallback(task)"  tag='div' class="task d-flex align-self-left" :class="{selected: selectedTask == task.id}"  @dblclick="taskShow(task.id)" ><div class='task-wrapper' @mousedown="taskSelect(task.id)"> {{ task.title }}</div>
+      <div  tag='div' class="task d-flex align-self-left" :class="{selected: selectedTask == task.id}"  @dblclick="taskShow(task.id)" ><div class='task-wrapper' @mousedown="taskSelect(task.id)"> {{ task.title }}</div>
       </div>
       </li>
     </template>
@@ -32,10 +19,7 @@
     <div style="border-right: none; border-left: none" class="col" id='column'>
     <h3 class='column-title'>In Progress</h3>
      <div v-if="data.isMessage.value" :class="{ error: data.isError.value, message: true }">{{data.message.value}}</div>
-       <!-- <div class="task d-flex align-self-left" :class="{selected: selectedTask == task.id}"  v-for="task in progress" :key="task.id" @dblclick="taskShow(task.id)" ><div class='task-wrapper' @click="taskSelect(task.id)"> {{ task.title }}</div>
- 
-      </div> -->
-       <draggable item-key="id" :animation="300" v-model="progress" tag="ul" group='tasks' id='tasks'>
+       <draggable @end='checkMove' class="tasks"   item-key="id" :animation="300"  :list="progress" tag="ul" group='tasks' id='1'>
     <template #item="{ element: task }">
       <li id='task'>
       <div tag='div' class="task d-flex align-self-left" :class="{selected: selectedTask == task.id}"  @dblclick="taskShow(task.id)" ><div class='task-wrapper' @mousedown="taskSelect(task.id)"> {{ task.title }}</div>
@@ -43,14 +27,10 @@
       </li>
     </template>
   </draggable>
-      
     </div>
     <div class="col" id='column'>
     <h3 class='column-title' >Completed</h3>
-      <!-- <div class="task d-flex align-self-left" :class="{selected: selectedTask == task.id}"  v-for="task in completed" :key="task.id" @dblclick="taskShow(task.id)" ><div class='task-wrapper' @click="taskSelect(task.id)"> {{ task.title }}</div>
- 
-      </div> -->
-      <draggable item-key="id" :animation="300" v-model="completed" tag="ul" group='tasks' id='tasks'>
+      <draggable @end='checkMove' class="tasks" item-key="id" :animation="300" :list="completed" tag="ul" group='tasks' id='2'>
     <template #item="{ element: task }">
       <li id='task'>
       <div tag='div' class="task d-flex align-self-left" :class="{selected: selectedTask == task.id}"  @dblclick="taskShow(task.id)" ><div class='task-wrapper' @mousedown="taskSelect(task.id)"> {{ task.title }}</div>
@@ -93,6 +73,7 @@ import {onMounted, ref, reactive, computed, watch} from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { socket } from '@/utils/socket'
 import draggable from 'vuedraggable';
+
 
 
 const router = useRouter()
@@ -149,18 +130,111 @@ console.log(completed.value)
     tasks.value.splice(index, 1)
   }
   });
-   socket.on('task-updated', async (taskId) => {
+   socket.on('task-updated', async (taskUpdated) => {
+    console.log(taskUpdated, 'task on socket update')
+    console.log(todo.value.filter(task => task.id === taskUpdated.id), 'value todo')
+    var taskIndex = null;
+
+    if (taskUpdated.status === 0) { 
+        taskIndex = todo.value.findIndex((t) => t.id === Number(taskUpdated.id))
+      if (taskIndex !== -1) {
+      
+    return
+  } else {
+    taskIndex = progress.value.findIndex((t) => t.id === Number(taskUpdated.id))
+    if (taskIndex !== -1) { 
+        progress.value.splice(taskIndex, 1)
+        todo.value.push(taskUpdated)
+      } else {
+        progress.value.push(taskUpdated)
+        completed.value.splice(taskIndex, 1)
+      }
+    taskIndex = progress.value.findIndex((t) => t.id === Number(taskUpdated.id))
+        if (taskIndex !== -1) { 
+        progress.value.splice(taskIndex, 1)
+      } else {
+        completed.value.splice(taskIndex, 1)
+      }
+    todo.value.push(taskUpdated)
+  }
+    } else if (taskUpdated.status === 1) {
+      taskIndex = progress.value.findIndex((t) => t.id === Number(taskUpdated.id))
+      if (taskIndex !== -1) { 
+        console.log(taskIndex, 'task index v found in progress')
+        console.log('found in progress')
+        return
+      } else {
+        taskIndex = todo.value.findIndex((t) => t.id === Number(taskUpdated.id))
+        if (taskIndex !== -1) { 
+          console.log('статус прогресс найдено в туду')
+          todo.value.splice(taskIndex, 1)
+        progress.value.push(taskUpdated)
+      } else {
+         console.log('статус прогресс найдено в комплетед')
+         
+         console.log(taskIndex, 'task index')
+        completed.value.splice(taskIndex, 1)
+        progress.value.push(taskUpdated)
+      }}
+    } else  {
+      taskIndex = completed.value.findIndex((t) => t.id === Number(taskUpdated.id))
+      if (taskIndex !== -1) { 
+        console.log(completed.value, taskUpdated)
+        console.log('found in completed')
+        return
+      } else {
+        taskIndex = todo.value.findIndex((t) => t.id === Number(taskUpdated.id))
+         if (taskIndex !== -1) { 
+        todo.value.splice(taskIndex, 1)
+        completed.value.push(taskUpdated)
+
+      } else {
+        progress.value.splice(taskIndex, 1)
+        completed.value.push(taskUpdated)
+      }
+      }
+    }
   //   const index = tasks.value.findIndex((t) => t.id === Number(taskId))
   //  if (index !== -1) {
   //   tasks.value.splice(index, 1)
   // }
+
+    // ПРОВЕРИТЬ ЕСТЬ ЛИ ЭЛЕМЕНТ, ЕСЛИ НЕТ ДОБАВИТЬ, А СТАРЫЙ УДАЛИТЬ 
+    // ЧТОБЫ УДАЛИТЬ СТАРЫЙ НУЖНО ЕГО ПОИСКАТЬ В ДВУХ ОСТАВШИХСЯ МАССИВАХ
+
+
   });
 
 })
 
-function onMoveCallback(evt, originalEvent){
-  console.log(evt, 'evt')
-   console.log('we dragged')
+async function checkMove(evt){
+  console.log(Number(evt.to.id))
+const taskId = evt.item._underlying_vm_.id
+const status = Number(evt.to.id)
+
+
+
+//return false
+  // RETURN FALSE TO CANCEL
+
+   try {
+    const token = document.cookie.match('token=([^;]+)');
+
+    const requestOptions = {
+      method: "PUT",
+      headers: { 'Content-Type': 'application/json', 'Authorization': `${token[1]}` },
+      body: JSON.stringify({ taskId, status})
+    };
+    const response = await fetch(`${import.meta.env.VITE_API_HOST}:${import.meta.env.VITE_API_PORT}/api/tasks`, requestOptions);
+    if (response.ok) {
+      console.log('ok');
+    } else {
+      console.log('occured error on server side')
+    }
+  } catch (error) {
+    console.error(error);
+    
+  }
 }
 
 function taskToggle() {
@@ -262,6 +336,8 @@ watch(task, (newValue, oldValue) => {
   console.log('Count changed:', newValue, 'Old value:', oldValue);
 });
 
+
+
 function clearValues() {
   task.title.value = '';
   task.description.value = '';
@@ -275,22 +351,6 @@ function clearValues() {
   // }
   console.log(task.value, 'task value')
 }
-
-
-
-
-
-// const todo = computed(() => {
-//   return tasks.value.filter((task) => task.status === 0)
-// })
-
-// const progress = computed(() => {
-//   return tasks.value.filter((task) => task.status === 1)
-// })
-
-// const completed = computed(() => {
-//   return tasks.value.filter((task) => task.status === 2)
-// })
 
 </script>
 
@@ -331,7 +391,7 @@ li#task {
   margin: 0;
 }
 
-ul#tasks {
+.tasks {
   margin: 0;
   height: 100%;
 }

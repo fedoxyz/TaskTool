@@ -8,6 +8,12 @@ const bcrypt = require('bcrypt');
 
 const router = express.Router()
 
+// socket.io middleware
+router.use(function(req, res, next) {
+  req.io = app.get("io");
+  next();
+});
+
 // Error handling middleware
 function errorHandler(err, req, res, next) {
   console.error(err.stack);
@@ -20,11 +26,7 @@ router.use(errorHandler);
 // Register the cookieParser
 router.use(cookieParser());
 
-// socket.io middleware
-router.use(function(req, res, next) {
-    req.io = app.get("io");
-    next();
-});
+
 
 // evade issues with headers
 app.use((req, res, next) => {
@@ -60,7 +62,6 @@ router.use(async (req, res, next) => {
   }
 })
 
-
 app.use(express.json())
 // GET METHOD API URL | RETRIEVE ITEMS
 app.get('/api/users', async (req, res, next) => {
@@ -73,8 +74,6 @@ app.get('/api/users', async (req, res, next) => {
     next(error);
   }
 });
-
-
 
 // post method to verify JWT token on vue router
 app.post('/api/verify', async (req, res, next) => {
@@ -100,15 +99,6 @@ app.post('/api/users', async (req, res, next) => {
   }
 });
 
-// PUT METHOD API URL | UPDATE ITEM
-app.put('/api/users', async (req, res, next) => {
-  try {
-    const user = await db.User.update(req.body);
-    res.json(user);
-  } catch (error) {
-    next(error);
-  }
-});
 
 // GET METHOD API URL | RETRIEVE ITEMS
 app.get('/api/taskboards', router, async (req, res, next) => {
@@ -137,15 +127,7 @@ app.post('/api/taskboards', router, async (req, res, next) => {
   }
 });
 
-// PUT METHOD API URL | UPDATE ITEM
-app.put('/api/taskboards', router, async (req, res, next) => {
-  try {
-    const taskboard = await db.TaskBoard.update(req.body);
-    res.json(taskboard);
-  } catch (error) {
-    next(error);
-  }
-});
+
 
 // DELETE METHOD API URL | DELETE ITEM
 app.delete('/api/taskboards/:id', router, async (req, res, next) => {
@@ -202,14 +184,10 @@ app.post('/api/sign-in', async (req, res, next) => {
     res.status(401).json({ message: 'Invalid email or password' });
   }
       
-
-
   } catch (error) {
     next(error);
   }
 });
-
-
 
 app.post('/api/get-tasks', router, async (req, res, next) => {
   try {
@@ -264,10 +242,24 @@ app.post('/api/tasks', router, async (req, res, next) => {
         res.status(500).json(error)
         next(error);
       }
-      
-    
   }
 });
+
+app.put('/api/tasks', router, async (req, res, next) => {
+  try {
+    const task = await db.Task.findOne({where: {
+      id: req.body.taskId
+    }})
+    const taskUpdated = await task.update({status: req.body.status});
+    console.log(req.io)
+    req.io.emit('task-updated', taskUpdated);
+    res.json(taskUpdated);
+  } catch (error) {
+    next(error);
+  }
+});
+
+
 
 app.get('/api/overview', router, async (req, res, next) => {
   try {
@@ -282,6 +274,7 @@ app.get('/api/overview', router, async (req, res, next) => {
     next()
   }
 })
+
 
 
 
