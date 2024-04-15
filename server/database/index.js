@@ -56,16 +56,27 @@ async function setupDB() {
             title: {
               type: DataTypes.STRING(255),
               allowNull: false,
+              validate: {
+                notEmpty: false,
+              }
             },
             description: {
               type: DataTypes.TEXT,
+              allowNull: false,
+              validate: {
+                notEmpty: false,
+              }
             },
             status: {
               type: DataTypes.INTEGER,
               allowNull: true,
             },
             due_date: {
-              type: DataTypes.STRING, // STRING FOR TEST, CHANGE TO DATE
+              type: DataTypes.DATE, 
+              allowNull: false,
+              validate: {
+                notEmpty: false,
+              }
             },
             assignee_id: {
               type: DataTypes.INTEGER,
@@ -94,6 +105,9 @@ async function setupDB() {
             name: {
               type: DataTypes.STRING(100),
               allowNull: false,
+              validate: {
+                notEmpty: false,
+              }
             },
             creatorId: {
               type: DataTypes.INTEGER,
@@ -116,12 +130,13 @@ async function setupDB() {
               allowNull: false,
             },
             assigned_date: {
-              type: DataTypes.STRING,
+              type: DataTypes.DATE,
+              allowNull: false
             },
           });
 
 
-        // await sequelize.sync({force: true});
+      
         await sequelize.sync({force: false});
         
         // await db.<ModelName>.create({ <key: "value"> }); // THIS CREATES ENTRIES

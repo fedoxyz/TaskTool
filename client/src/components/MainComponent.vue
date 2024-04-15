@@ -10,6 +10,11 @@ const taskboard = reactive({
   name: {type: String, value: ''},
   creatorId: {type: Number, value: null},
 })
+const data = reactive({
+    isMessage: false,
+    isError: {type: Boolean, value: false},
+    message: {type: String, value: ''}
+})
 
 const userId = ref(0)
 
@@ -33,8 +38,15 @@ async function addTaskboard(name) {
      if (!response.ok) {
       console.error("Failed", response.statusText);
       router.push('/auth');
+       data.isMessage = true;
+        data.isError = true;
+        data.message = 'Failed to add taskboard';
+    } else {
+      data.isMessage = false;
+        data.isError = false;
+        data.message = '';
+        taskboard.name.value = '';
     }
-    taskboard.value = {id: null, name: '', creatorId: null};
   } catch (error) {
     console.lop('123123')
     router.push('/auth');
@@ -137,7 +149,7 @@ async function fetchTaskboards() {
          <button id='button'>Dashboard</button>
         </router-link>
          
-        </div>
+        </div><span v-if="data.isMessage" :class="{ error: data.isError }">{{data.message}}</span>
   
     </div>
   </div>

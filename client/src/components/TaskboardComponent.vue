@@ -7,22 +7,57 @@
 <div class='d-flex'>
  <div class="col" id='column'>
  <h3 class='column-title' >To Do</h3>
-      <div class="task d-flex align-self-left" :class="{selected: selectedTask == task.id}"  v-for="task in todo" :key="task.id" @dblclick="taskShow(task.id)" ><div class='task-wrapper' @click="taskSelect(task.id)"> {{ task.title }}</div>
+      <!-- <div tag='div' class="task d-flex align-self-left" :class="{selected: selectedTask == task.id}"  v-for="task in todo" :key="task.id" @dblclick="taskShow(task.id)" ><div class='task-wrapper' @click="taskSelect(task.id)"> {{ task.title }}</div>
       
+      </div> -->
+
+
+       <!-- <draggable v-model="todo" tag="ul" group="tasks">
+    <template #item="{ element: task }">
+      <li>{{ task }}</li>
+    </template>
+  </draggable> -->
+
+
+
+       <draggable item-key="id" :options="{direction:'vertical'}" direction='vertical' :animation="300" v-model="todo" tag="ul" group='tasks' id='tasks'>
+    <template #item="{ element: task }">
+      <li id='task'>
+      <div  tag='div' class="task d-flex align-self-left" :class="{selected: selectedTask == task.id}"  @dblclick="taskShow(task.id)" ><div class='task-wrapper' @mousedown="taskSelect(task.id)"> {{ task.title }}</div>
       </div>
+      </li>
+    </template>
+  </draggable>
     </div>
     <div style="border-right: none; border-left: none" class="col" id='column'>
     <h3 class='column-title'>In Progress</h3>
      <div v-if="data.isMessage.value" :class="{ error: data.isError.value, message: true }">{{data.message.value}}</div>
-       <div class="task d-flex align-self-left" :class="{selected: selectedTask == task.id}"  v-for="task in progress" :key="task.id" @dblclick="taskShow(task.id)" ><div class='task-wrapper' @click="taskSelect(task.id)"> {{ task.title }}</div>
+       <!-- <div class="task d-flex align-self-left" :class="{selected: selectedTask == task.id}"  v-for="task in progress" :key="task.id" @dblclick="taskShow(task.id)" ><div class='task-wrapper' @click="taskSelect(task.id)"> {{ task.title }}</div>
  
+      </div> -->
+       <draggable item-key="id" :options="{direction:'vertical'}" direction='vertical'  :animation="300" v-model="progress" tag="ul" group='tasks' id='tasks'>
+    <template #item="{ element: task }">
+      <li id='task'>
+      <div tag='div' class="task d-flex align-self-left" :class="{selected: selectedTask == task.id}"  @dblclick="taskShow(task.id)" ><div class='task-wrapper' @mousedown="taskSelect(task.id)"> {{ task.title }}</div>
       </div>
+      </li>
+    </template>
+  </draggable>
+      
     </div>
     <div class="col" id='column'>
     <h3 class='column-title' >Completed</h3>
-      <div class="task d-flex align-self-left" :class="{selected: selectedTask == task.id}"  v-for="task in completed" :key="task.id" @dblclick="taskShow(task.id)" ><div class='task-wrapper' @click="taskSelect(task.id)"> {{ task.title }}</div>
+      <!-- <div class="task d-flex align-self-left" :class="{selected: selectedTask == task.id}"  v-for="task in completed" :key="task.id" @dblclick="taskShow(task.id)" ><div class='task-wrapper' @click="taskSelect(task.id)"> {{ task.title }}</div>
  
+      </div> -->
+      <draggable item-key="id" :options="{direction:'vertical'}" :animation="300" v-model="completed" tag="ul" group='tasks' id='tasks'>
+    <template #item="{ element: task }">
+      <li id='task'>
+      <div tag='div' class="task d-flex align-self-left" :class="{selected: selectedTask == task.id}"  @dblclick="taskShow(task.id)" ><div class='task-wrapper' @mousedown="taskSelect(task.id)"> {{ task.title }}</div>
       </div>
+      </li>
+    </template>
+  </draggable>
     </div>
     </div>
     <div class='controls'>
@@ -36,10 +71,11 @@
 
 
   <div v-if="!isTasksToggled" class="add-tab">
+  <h1>Add Task</h1>
   <input placeholder="Title..." id='input' v-model='task.title.value' >
-  <input placeholder="Description..." id='input' v-model='task.description.value' >
-  <input placeholder="Due date..." id='input' v-model='task.dueDate.value' >
-  <input placeholder="Assignee name..." id='input' v-model='task.assigneeName.value' >
+  <input class='mt-3' placeholder="Description..." id='input' v-model='task.description.value' >
+  <input class='mt-3' placeholder="Due date..." id='input' v-model='task.dueDate.value' >
+  <input class='mt-3' placeholder="Assignee name..." id='input' v-model='task.assigneeName.value' >
   
   <div class='controls'>
   <button class='main' @click="addTask()" id='button'>Add Task</button>
@@ -53,9 +89,10 @@
 </template>
 
 <script setup>
-import {onMounted, ref, reactive, computed} from 'vue'
+import {onMounted, ref, reactive, computed, watch} from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { socket } from '@/utils/socket'
+import draggable from 'vuedraggable';
 
 
 const router = useRouter()
@@ -68,7 +105,7 @@ const task = reactive({
     title: { type: String, value: '' },
     description: { type: String, value: '' },
     dueDate: { type: String, value: '' },
-    assigneeId: { type: Number, value: 0 },
+
     assigneeName: { type: String, value: '' }
 })
 const data = reactive({
@@ -81,15 +118,29 @@ const taskboardName = ref({type: String, value: ''})
 const selectedTask = ref({type: Number, value: 0 })
 
 const tasks = ref([])
-//const tasks = ref({type: Array, value: []})
+
+const todo = ref([])
+const progress = ref([])
+const completed = ref([])
+
 
  onMounted(async () => {
   await fetchTasks();
+  console.log(tasks.value)
+  todo.value = tasks.value.filter((task) => task.status === 0)
+progress.value = tasks.value.filter((task) => task.status === 1)
+completed.value = tasks.value.filter((task) => task.status === 2)
+  console.log(todo.value, 'after fetch tasks')
+console.log(progress.value)
+console.log(completed.value) 
 
   socket.on('task-added', async (newTask) => {
     console.log(newTask, 'newTask')
-    console.log(tasks, 'value taskboards')
-    tasks.value.push(newTask);
+    if (newTask.taskboard_id == task.taskboardId.value) {
+      console.log(tasks, 'value taskboards')
+    todo.value.push(newTask);
+    }
+    
   });
 
   socket.on('task-removed', async (taskId) => {
@@ -97,6 +148,12 @@ const tasks = ref([])
    if (index !== -1) {
     tasks.value.splice(index, 1)
   }
+  });
+   socket.on('task-updated', async (taskId) => {
+  //   const index = tasks.value.findIndex((t) => t.id === Number(taskId))
+  //  if (index !== -1) {
+  //   tasks.value.splice(index, 1)
+  // }
   });
 
 })
@@ -162,10 +219,10 @@ async function addTask() {
       body: JSON.stringify({ taskboard_id: task.taskboardId.value, title: task.title.value, description: task.description.value, due_date: task.dueDate, assigneeName: task.assigneeName.value })
       };
     console.log(requestOptions, 'requestedOptions')
-    
+    var jsonResponse = null
     const response = await fetch(`${import.meta.env.VITE_API_HOST}:${import.meta.env.VITE_API_PORT}/api/tasks`, requestOptions)
     console.log(response, 'response')
-   const jsonResponse = await response.json()
+   var jsonResponse = await response.json()
    console.log(jsonResponse, 'json response when adding task')
      if (!response.ok) {
         console.log('response not ok')
@@ -177,13 +234,17 @@ async function addTask() {
         return
     }
       console.error("Failed", response.statusText);
-      router.push('/auth');
+       data.isMessage.value = true
+    data.isError.value = true
+    data.message.value = `Failed to add task`
       console.log(response, 'response')
+      return
     }
     data.isMessage.value = true
     data.isError.value = false
     data.message.value = `Task ${task.title.value} successfully created`
-    task.value = {taskboardId: null, title: '', description: '', dueData: '', assigneeId: null};
+    clearValues()
+    
   } catch (error) {
     console.log('123123')
     console.log('123123')
@@ -192,17 +253,39 @@ async function addTask() {
   }
 }
 
-const todo = computed(() => {
-  return tasks.value.filter((task) => task.status === 0)
-})
+watch(task, (newValue, oldValue) => {
+  console.log('Count changed:', newValue, 'Old value:', oldValue);
+});
 
-const progress = computed(() => {
-  return tasks.value.filter((task) => task.status === 1)
-})
+function clearValues() {
+  task.title.value = '';
+  task.description.value = '';
+  task.dueDate.value = '';
+  task.assigneeName.value = '';
+  // task.value = {
+  //   title: '',
+  //   description: '',
+  //   dueData: '',
+  //   assigneeName: '',
+  // }
+  console.log(task.value, 'task value')
+}
 
-const completed = computed(() => {
-  return tasks.value.filter((task) => task.status === 2)
-})
+
+
+
+
+// const todo = computed(() => {
+//   return tasks.value.filter((task) => task.status === 0)
+// })
+
+// const progress = computed(() => {
+//   return tasks.value.filter((task) => task.status === 1)
+// })
+
+// const completed = computed(() => {
+//   return tasks.value.filter((task) => task.status === 2)
+// })
 
 </script>
 
@@ -214,6 +297,7 @@ const completed = computed(() => {
 .task {
      user-select: none;
     cursor: pointer;
+    width: 100%;
 }
 
 .column-title {
@@ -234,5 +318,16 @@ const completed = computed(() => {
   padding: 7px 10px 7px 10px;
   flex-grow: 1;
   text-align: left;
+}
+
+li#task {
+  border: none;
+  overflow: unset;
+  margin: 0;
+}
+
+ul#tasks {
+  margin: 0;
+  height: 100%;
 }
 </style>

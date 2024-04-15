@@ -251,7 +251,7 @@ app.post('/api/tasks', router, async (req, res, next) => {
     const task = await db.Task.create({taskboard_id: req.body.taskboard_id, title: req.body.title, description: req.body.description, due_date: req.body.due_date.value, assignee_id: assigneeId, creator_id: creatorId });
     console.log(assigneeId, 'assignee id')
     if (assigneeId) {
-      await db.TaskAssignment.create({task_id: task.id, assignee_id: assigneeId, assigned_date: task.assigned_date})
+      await db.TaskAssignment.create({task_id: task.id, assignee_id: assigneeId, assigned_date: task.createdAt})
     }
     req.io.emit('task-added', task);
     res.json(task);
@@ -261,6 +261,7 @@ app.post('/api/tasks', router, async (req, res, next) => {
         console.log('wwe hererer')
         res.status(401).json(error.message)
       } else {
+        res.status(500).json(error)
         next(error);
       }
       

@@ -1,21 +1,21 @@
 <template>
-  <div id='theContainer'>
+  <div class='container'>
     <h1>Dashboard</h1>
     <h2>My Taskboards</h2>
     <ul>
-    <li v-for="taskboard in taskboardsCreated">{{taskboard.name}} {{taskboard.updatedAt}}</li>
+    <li id='dashboard' v-for="taskboard in taskboardsCreated">{{taskboard.name}} {{taskboard.updatedAt}}</li>
     </ul>
 
     
     <h2>Tasks</h2>
     <h4>Created:</h4>
      <ul>
-    <li v-for="task in tasksCreated">{{task.title}} {{task.status}} {{task.updatedAt}}</li>
+    <li id='dashboard' v-for="task in tasksCreated">{{task.title}} {{task.status}} {{task.updatedAt}}</li>
     
     </ul>
     <h4>Assigned to:</h4>
          <ul>
-    <li v-for="task in tasksAssigned">{{task.title}} {{task.status}} {{task.updatedAt}}</li>
+    <li id='dashboard' v-for="task in tasksAssigned">{{task.title}} {{task.status}} {{task.updatedAt}}</li>
     </ul>
 
     <router-link to="/app">
@@ -92,6 +92,10 @@ h2 {
   font-weight: lighter;
   font-family: system-ui;
   color: #ddd;
+}
+
+li#dashboard {
+        padding: 10px;
 }
 
 
