@@ -242,16 +242,21 @@ app.post('/api/tasks', router, async (req, res, next) => {
       console.log(req.body.assigneeName)
       const assigneeUser = await db.User.findOne({where: {username: req.body.assigneeName}})
       assigneeId = assigneeUser.id;
+      
     } catch {
       throw Error('UserNotFound')
     }
   }
     console.log('if user not found dont go here')
     const task = await db.Task.create({taskboard_id: req.body.taskboard_id, title: req.body.title, description: req.body.description, due_date: req.body.due_date.value, assignee_id: assigneeId, creator_id: creatorId });
+    console.log(assigneeId, 'assignee id')
+    if (assigneeId) {
+      await db.TaskAssignment.create({task_id: task.id, assignee_id: assigneeId, assigned_date: task.assigned_date})
+    }
     req.io.emit('task-added', task);
     res.json(task);
   } catch (error) {
-    console.log(error.message, 'nmessage')
+    console.log(error.message, 'message')
       if (error.message === 'UserNotFound') {
         console.log('wwe hererer')
         res.status(401).json(error.message)
@@ -263,6 +268,19 @@ app.post('/api/tasks', router, async (req, res, next) => {
   }
 });
 
+app.get('/api/overview', router, async (req, res, next) => {
+  try {
+    const userId = req.decodedToken['id'] 
+    const taskboardsCreated = await db.TaskBoard.findAll({where: {creatorId: userId}})
+    const tasksCreated = await db.Task.findAll({where: {creator_id: userId}})
+    const tasksAssigned = await db.TaskAssignment.findAll({where: {assignee_id: userId}})
+    res.json({taskboardsCreated, tasksCreated, tasksAssigned});
+  }catch (error) {
+    console.log(error.message, 'nmessage')
+    res.status(401).json(error.message)
+    next()
+  }
+})
 
 
 

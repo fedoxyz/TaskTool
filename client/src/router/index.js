@@ -2,14 +2,16 @@ import { createRouter, createWebHistory } from 'vue-router'
 import TheWelcomeView from '@/views/TheWelcomeView.vue'
 import MainView from '@/views/MainView.vue'
 import AuthorizationView from '@/views/AuthorizationView.vue'
-import TasboardView from '@/views/TaskboardView.vue'
+import TaskboardView from '@/views/TaskboardView.vue'
+import DashboardView from '@/views/DashboardView.vue'
 
 
 const routes = [
   { path: '/', component: TheWelcomeView },
   { path: '/app', component: MainView },
   { path: '/auth', component: AuthorizationView },
-  { path: '/taskboard/:id', component: TasboardView, name: 'Taskboard', props: true }
+  { path: '/taskboard/:id', component: TaskboardView, name: 'Taskboard', props: true },
+  { path: '/dashboard', component: DashboardView, name: 'Dashboard'}
 ]
 
 

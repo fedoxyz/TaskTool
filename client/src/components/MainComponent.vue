@@ -133,8 +133,8 @@ async function fetchTaskboards() {
        <div class='controls'>
    
     <button @click="addTaskboard(taskboard.name.value)" class='main' id="button">Add Taskboard</button>
-    <router-link to='/'>
-         <button id='button'>Back to Home</button>
+    <router-link to='/dashboard'>
+         <button id='button'>Dashboard</button>
         </router-link>
          
         </div>

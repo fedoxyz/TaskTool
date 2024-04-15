@@ -107,8 +107,16 @@ async function setupDB() {
               primaryKey: true,
               autoIncrement: true,
             },
+            task_id: {
+              type: DataTypes.INTEGER,
+              allowNull: false,
+            },
+            assignee_id: {
+              type: DataTypes.INTEGER,
+              allowNull: false,
+            },
             assigned_date: {
-              type: DataTypes.DATE,
+              type: DataTypes.STRING,
             },
           });
 
