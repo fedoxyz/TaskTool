@@ -20,10 +20,10 @@
 
 
 
-       <draggable item-key="id" :options="{direction:'vertical'}" direction='vertical' :animation="300" v-model="todo" tag="ul" group='tasks' id='tasks'>
+       <draggable  item-key="id" :animation="300" v-model="todo" tag="ul" group='tasks' id='tasks'>
     <template #item="{ element: task }">
       <li id='task'>
-      <div  tag='div' class="task d-flex align-self-left" :class="{selected: selectedTask == task.id}"  @dblclick="taskShow(task.id)" ><div class='task-wrapper' @mousedown="taskSelect(task.id)"> {{ task.title }}</div>
+      <div :move="onMoveCallback(task)"  tag='div' class="task d-flex align-self-left" :class="{selected: selectedTask == task.id}"  @dblclick="taskShow(task.id)" ><div class='task-wrapper' @mousedown="taskSelect(task.id)"> {{ task.title }}</div>
       </div>
       </li>
     </template>
@@ -35,7 +35,7 @@
        <!-- <div class="task d-flex align-self-left" :class="{selected: selectedTask == task.id}"  v-for="task in progress" :key="task.id" @dblclick="taskShow(task.id)" ><div class='task-wrapper' @click="taskSelect(task.id)"> {{ task.title }}</div>
  
       </div> -->
-       <draggable item-key="id" :options="{direction:'vertical'}" direction='vertical'  :animation="300" v-model="progress" tag="ul" group='tasks' id='tasks'>
+       <draggable item-key="id" :animation="300" v-model="progress" tag="ul" group='tasks' id='tasks'>
     <template #item="{ element: task }">
       <li id='task'>
       <div tag='div' class="task d-flex align-self-left" :class="{selected: selectedTask == task.id}"  @dblclick="taskShow(task.id)" ><div class='task-wrapper' @mousedown="taskSelect(task.id)"> {{ task.title }}</div>
@@ -50,7 +50,7 @@
       <!-- <div class="task d-flex align-self-left" :class="{selected: selectedTask == task.id}"  v-for="task in completed" :key="task.id" @dblclick="taskShow(task.id)" ><div class='task-wrapper' @click="taskSelect(task.id)"> {{ task.title }}</div>
  
       </div> -->
-      <draggable item-key="id" :options="{direction:'vertical'}" :animation="300" v-model="completed" tag="ul" group='tasks' id='tasks'>
+      <draggable item-key="id" :animation="300" v-model="completed" tag="ul" group='tasks' id='tasks'>
     <template #item="{ element: task }">
       <li id='task'>
       <div tag='div' class="task d-flex align-self-left" :class="{selected: selectedTask == task.id}"  @dblclick="taskShow(task.id)" ><div class='task-wrapper' @mousedown="taskSelect(task.id)"> {{ task.title }}</div>
@@ -157,6 +157,11 @@ console.log(completed.value)
   });
 
 })
+
+function onMoveCallback(evt, originalEvent){
+  console.log(evt, 'evt')
+   console.log('we dragged')
+}
 
 function taskToggle() {
     isTasksToggled.value = !isTasksToggled.value;
