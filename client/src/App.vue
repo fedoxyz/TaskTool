@@ -24,17 +24,26 @@ header {
   color: white;
 }
 
+a {
+  text-decoration: none;
+  flex-grow:1;
+}
+
+h1 {
+  color: #ddd!important;
+}
+
 body {
   background: linear-gradient(135deg, var(--colorPrimary), #4e085f);
   display: flex;
   justify-content: center;
   align-items: center;
   margin: 0;
-  color: #fff;
+  color: #ddd;
 }
 
  input {
-    margin-bottom: 10px;
+
     padding: 10px;
     border-radius: 5px;
     color: black; 
@@ -54,13 +63,15 @@ body {
     border-radius: 23px;
     width: 100%;
     background: transparent;
-    color: white; 
+    color: #ddd; 
     width: 33%;
-    border: 1px solid white !important;
+    border: 2px solid rgba(0, 0, 0, 0.1) !important;
     padding: 10px;
   }
 
-
+  button.main {
+    background:  linear-gradient(135deg, #401f819e, #30206b);
+  }
 
   button:hover {
     background-color: #aaaaaa23;
@@ -76,17 +87,19 @@ body {
     justify-content: space-between;
     align-items: center;
     margin-bottom: 10px;
-    padding: 10px;
     border: 1px solid #ffffff4a;
     border-radius: 23px;
-    background-color: #fff;
-    color: rgb(255, 255, 255); 
+    background-color: #ddd;
+    color: #ddd; 
     background-color: transparent;
+    overflow: hidden;
+    
   }
 
   .message {
     color: #fff;
-    margin-top: 3%
+    margin-top: 3%;
+    font-weight: 200;
   }
   .error {
     color: red;
@@ -96,6 +109,8 @@ body {
       margin-left: 3.5%;
     margin-right: 3.5%;
 }
+
+
 
 
 </style>

@@ -62,6 +62,10 @@ async function deleteTask(id) {
   }
 }
 
+function clickTaskboard(id) {
+  router.push({ name: 'Taskboard', params: { id }})
+}
+
 
 
 onMounted(async () => {
@@ -104,7 +108,7 @@ async function fetchTaskboards() {
   } catch (error) {
   console.log('1231123123123')
     console.error(error);
-    
+   //#55166a9e 
   }
 }
 </script>
@@ -115,27 +119,26 @@ async function fetchTaskboards() {
 <h1>Taskboards</h1>
      
     <ul>
-      <li v-for="item in taskboards" :key="item.id">  
-      <router-link :to="{ name: 'Taskboard', params: { id: item.id }, props: { taskboardName: item.name }  }"><div>{{ item.name}} </div></router-link>
-        <button v-if="item.creatorId == userId" type="button" class="btn-close btn-close-white" aria-label="Close" @click="deleteTask(item.id)"></button>
+    
+      <li @click="clickTaskboard(item.id)" class='d-flex' v-for="item in taskboards" :key="item.id">  
+
+      
+      <router-link :to="{ name: 'Taskboard', params: { id: item.id }, props: { taskboardName: item.name }  }"><div class="taskboard-wrapper d-flex">{{ item.name}}<button v-if="item.creatorId == userId" type="button" class="btn-close btn-close-white" aria-label="Close" @click.stop.prevent="deleteTask(item.id)"></button>
+      </div></router-link>
+        
       </li>
     </ul>
 
-     <!-- <input autofocus placeholder="Taskboard title..." id='input' v-model="taskboard.name.value">
-      <button @click="addTaskboard(taskboard.name.value)" id="addBtn">Add Taskboard</button> -->
-       <input autofocus placeholder="Taskboard title..." id='input' v-model="taskboard.name.value">
+       <input placeholder="Taskboard title..." id='input' v-model="taskboard.name.value">
        <div class='controls'>
-    <!-- <button id='button' @click="taskboardToggle()" >Add Taskboard</button> -->
    
-    <button @click="addTaskboard(taskboard.name.value)" id="button">Add Taskboard</button>
+    <button @click="addTaskboard(taskboard.name.value)" class='main' id="button">Add Taskboard</button>
     <router-link to='/'>
          <button id='button'>Back to Home</button>
         </router-link>
          
         </div>
-    <router-link to="/">
-        
-    </router-link>
+  
     </div>
   </div>
 </template>
@@ -160,7 +163,7 @@ async function fetchTaskboards() {
     margin-bottom: 23px;
     flex-direction: column;
     align-items: center;
-    border: 2px solid #ccc;
+    border: 2px solid #ddd;
     border-radius: 34px;
     padding-top: 34px;
     padding-bottom: 34px;
@@ -168,11 +171,24 @@ async function fetchTaskboards() {
   }
 .controls {
     
-    margin: 0% 0px 3% 0px
+       margin: 1em 0px 1em 0px;
 }
 
 #button {
   margin-top: 10px;
+}
+
+.taskboard-wrapper {
+   color: #ddd;
+   padding: 10px;
+   justify-content: space-between;
+}
+
+.taskboard-wrapper:hover {
+  background-color: #aaaaaa23;
+  
+  
+
 }
  
 </style>

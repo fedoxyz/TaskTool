@@ -11,7 +11,7 @@
       
       </div>
     </div>
-    <div class="col" id='column'>
+    <div style="border-right: none; border-left: none" class="col" id='column'>
     <h3 class='column-title'>In Progress</h3>
      <div v-if="data.isMessage.value" :class="{ error: data.isError.value, message: true }">{{data.message.value}}</div>
        <div class="task d-flex align-self-left" :class="{selected: selectedTask == task.id}"  v-for="task in progress" :key="task.id" @dblclick="taskShow(task.id)" ><div class='task-wrapper' @click="taskSelect(task.id)"> {{ task.title }}</div>
@@ -26,7 +26,7 @@
     </div>
     </div>
     <div class='controls'>
-    <button id='button' @click="taskToggle()" >Add Task</button>
+    <button class='main' id='button' @click="taskToggle()" >Add Task</button>
     <router-link to='/app'>
           <button id='button' >Back</button>
         </router-link>
@@ -42,7 +42,7 @@
   <input placeholder="Assignee name..." id='input' v-model='task.assigneeName.value' >
   
   <div class='controls'>
-  <button @click="addTask()" id='button'>Add Task</button>
+  <button class='main' @click="addTask()" id='button'>Add Task</button>
   <button @click="taskToggle()" id='button'>Back</button>
   <div v-if="data.isMessage.value" :class="{ error: data.isError.value, message: true }">{{data.message.value}}</div>
   </div>
@@ -102,7 +102,8 @@ const tasks = ref([])
 })
 
 function taskToggle() {
-    isTasksToggled.value = !isTasksToggled.value 
+    isTasksToggled.value = !isTasksToggled.value;
+    data.isMessage.value = false;
 }
 
 function taskShow() {
@@ -208,7 +209,7 @@ const completed = computed(() => {
 <style>
 .controls {
     
-    margin: 3% 0px 3% 0px
+        margin: 1em 0px 1em 0px;
 }
 .task {
      user-select: none;
@@ -217,15 +218,16 @@ const completed = computed(() => {
 
 .column-title {
     margin: 0;
-     border-bottom: 1px solid #ccc;
+     border-bottom: 1px solid #383977;;
     padding: 10px 0px 10px 0px;
+    font-weight: 200;
 }
 #column {
-     border: 1px solid #ccc;
+     border: 1px solid #383977;;
 }
 
 .task.selected {
-  background-color: #55166a9e;
+  background-color: #aaaaaa23;
 }
 
 .task-wrapper {

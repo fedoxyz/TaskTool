@@ -96,15 +96,15 @@ watch(data, (newValue, oldValue) => {
     <div class='signin-tab' v-if='isSignIn'>
     <h2>Sign in</h2>
     <input autofocus placeholder="E-mail" id='input' v-model='user.email'>
-    <input placeholder="Password" id='input' v-model='user.password' >
+    <input class='mt-3' placeholder="Password" id='input' v-model='user.password' >
      <button @click="SignIn()" style="margin: 23px; width: 24%;">Sign In</button>
      <button @click="switchTab()" style="margin: 23px; width: 24%;">Sign Up</button>
     </div>
     <div class='signup-tab' v-else>
     <h2>Sign Up</h2>
-    <input autofocus placeholder="Username" id='input' v-model='user.username'>
-    <input placeholder="E-mail" id='input' v-model='user.email'>
-    <input placeholder="Password" id='input' v-model='user.password'>
+    <input placeholder="Username" id='input' v-model='user.username'>
+    <input class="mt-3" placeholder="E-mail"  id='input' v-model='user.email'>
+    <input class='mt-3' placeholder="Password"   id='input' v-model='user.password' >
       <button @click="SignUp()" style="margin: 23px; width: 24%;">Sign Up</button>
       <button @click="switchTab()" style="margin: 23px; width: 24%;">Sign In</button>
     </div>
