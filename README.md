@@ -22,7 +22,7 @@ GRANT ALL ON SCHEMA public TO db_username;
 ```
 
 # Start Server & Client
-`node server/server.js`
+`cd server && node server.js`
 
 `cd client && npm install && npm run dev`
 
