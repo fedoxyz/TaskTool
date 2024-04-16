@@ -21,6 +21,8 @@ GRANT ALL PRIVILEGES ON DATABASE db_name TO db_username;
 GRANT ALL ON SCHEMA public TO db_username;
 ```
 
-# Start server
-`node server`
+# Start Server & Client
+`node server/server.js`
+
+`cd client && npm run dev`
 
