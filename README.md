@@ -1,7 +1,7 @@
 # Shell
 `git clone https://github.com/fedoxyz/TaskTool.git`
 
-`cd TaskTool/server && npm init`
+`cd TaskTool/server && npm install`
 
 `sudo -u postgres psql`
 
@@ -24,5 +24,7 @@ GRANT ALL ON SCHEMA public TO db_username;
 # Start Server & Client
 `node server/server.js`
 
-`cd client && npm run dev`
+`cd client && npm install`
+
+`npm run dev`
 
