@@ -276,13 +276,14 @@ app.get('/api/overview', router, async (req, res, next) => {
   }
 })
 
-app.put('/api/update-task', router, async (req, res, next) => {
+app.post('/api/update-task', router, async (req, res, next) => {
   try {
     const userId = req.decodedToken['id'] 
     const taskId = req.body.taskId 
     const task = await db.Task.findOne({where: {id: taskId}})
-
+    console.log(req.body, 'req body')
     taskUpdated = await task.update({title: req.body.title, description: req.body.description, assignee_name: req.body.assignee_name})
+    console.log(taskUpdated, 'task updated')
 
     res.json(taskUpdated);
   }catch (error) {

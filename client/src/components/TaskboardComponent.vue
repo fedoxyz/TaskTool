@@ -10,7 +10,7 @@
        <draggable @end='checkMove' class="tasks"  item-key="id" :animation="300" :list="todo" tag="ul" group='tasks' id='0'>
     <template #item="{ element: task }">
       <li id='task'>
-      <div  tag='div' class="task d-flex align-self-left" :class="{selected: selectedTask.value.id == task.id}"  ><div class='task-wrapper' @mousedown="taskSelect(task)"> {{ task.title }}</div>
+      <div  tag='div' class="task d-flex align-self-left" :class="{selected: selectedTask.value.id == task.id}"  ><div class='task-wrapper' @mousedown="taskSelect(task)" > {{ task.title }}</div>
       </div>
       </li>
     </template>
@@ -33,7 +33,7 @@
       <draggable @end='checkMove' class="tasks" item-key="id" :animation="300" :list="completed" tag="ul" group='tasks' id='2'>
     <template #item="{ element: task }">
       <li id='task'>
-      <div tag='div' class="task d-flex align-self-left" :class="{selected: selectedTask.value.id == task.id}"   ><div class='task-wrapper' @mousedown="taskSelect(task)"> {{ task.title }}</div>
+      <div tag='div' class="task d-flex align-self-left" :class="{selected: selectedTask.value.id == task.id}"   ><div class='task-wrapper' @mousedown="taskSelect(task)" > {{ task.title }}</div>
       </div>
       </li>
     </template>
@@ -48,7 +48,7 @@
         </div>
     
   </div>
-  <TaskComponent :selectedTask='selectedTask'/>
+  <TaskComponent :selectedTask='selectedTask' :showTask='showTask'/>
 
 
   <div v-if="!isTasksToggled" class="add-tab">
@@ -100,11 +100,14 @@ const taskboardName = ref({type: String, value: ''})
 
 const selectedTask = reactive({type: Object, value: {} })
 
+
 const tasks = ref([])
 
 const todo = ref([])
 const progress = ref([])
 const completed = ref([])
+
+const showTask = ref(false)
 
 
  onMounted(async () => {
@@ -280,8 +283,9 @@ function taskToggle() {
 function taskSelect(task) {
   console.log(task, 'task param in task select')
   selectedTask.value = task
+  showTask.value = true
   console.log(selectedTask.value, 'selected task value')
-  console.log(selectedTask.value.id, 'id of selected task')
+  console.log(showTask.value, 'show task value')
 }
 
  // FETCH TASKS FROM REQUESTED TASKBOARD ON MOUNT

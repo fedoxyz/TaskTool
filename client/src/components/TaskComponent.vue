@@ -24,7 +24,7 @@
 </template>
 
 <script setup>
-import {reactive, defineProps, ref} from 'vue'
+import {reactive, defineProps, ref, watch} from 'vue'
 
 
 
@@ -39,22 +39,38 @@ const updatedTask = reactive({
   assigneeName: String
 })
 
+const isTaskReset = ref(false)
 const isNotEdited = ref(true)
 
+// ЕСЛИ ВЫБИРАЕТСЯ НОВЫЙ ТАСК, ПОМЕНЯТЬ SHOW TASK НА TRUE И ПЕРЕДАТЬ SHOW TASK В РЕБЕНКА
+
+// ЧАЙЛДУ ОТПРАВЛЯЕТСЯ SHOWTASK, ПРИ ЕГО ИЗМЕНЕНИИ НУЖНО 
+
+watch(props.selectedTask, async () => {
+  isNotEdited.value = true
+})
+
 function switchEdit() {
+  console.log(isTaskReset.value, 'reset task')
+  //  if (isTaskReset.value) {
+  //   isNotEdited.value = true
+  //   return
+  //  }
   console.log(props.selectedTask.value.id, 'selectedTask')
-  if (!props.selectedTask.value.id) {
+  if (!props.selectedTask.value.id ) {
     console.log('select task first')
     return
   }
-  console.log(props.selectedTask.value.title, props.selectedTask.value.description, props.selectedTask.value.assignee_name, 'props in setup')
+
   console.log(isNotEdited.value, 'isNotEdited value')
   if (isNotEdited.value) {
     updatedTask.title =  props.selectedTask.value.title
     updatedTask.description =  props.selectedTask.value.description
     updatedTask.assigneeName =  props.selectedTask.value.assignee_name
+    isTaskReset.value = false;
     console.log(updatedTask.title, 'updatedTask')
   }
+  console.log('we get here')
   isNotEdited.value = !isNotEdited.value;
 }
 
@@ -64,7 +80,7 @@ async function updateTask() {
    const requestOptions = {
       method: "POST",
       headers: { 'Content-Type': 'application/json', 'Authorization': `${token[1]}` },
-      body: JSON.stringify({ taskId: selectedTask.value.id, title: selectedTask.value.title, description: selectedTask.value.description, assignee_name: selectedTask.value.assigneeName })
+      body: JSON.stringify({ taskId: props.selectedTask.value.id, title: updatedTask.title, description: updatedTask.description, assignee_name: updatedTask.assignee_name })
       }
       console.log(requestOptions, 'requestOptions')
       const response = await fetch(`${import.meta.env.VITE_API_HOST}:${import.meta.env.VITE_API_PORT}/api/update-task`, requestOptions);
