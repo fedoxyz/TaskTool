@@ -294,7 +294,7 @@ if (req.body.assignee_name) {
 } else {
   taskUpdated = await task.update({title: req.body.title, description: req.body.description })
 }
-
+req.io.emit('task-updated', taskUpdated);
     console.log(taskUpdated, 'task updated')
 
     res.json(taskUpdated);

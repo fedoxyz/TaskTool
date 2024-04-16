@@ -135,7 +135,10 @@ console.log(completed.value)
     tasks.value.splice(index, 1)
   }
   });
-   socket.on('task-updated', async (taskUpdated) => {
+   socket.on('task-updated', async (taskUpdated, edited) => {
+
+    
+
     console.log(taskUpdated.taskboard_id, 'taskboard updated-id')
     console.log(task.taskboardId, 'taskobard-id')
     if (taskUpdated.taskboard_id !== Number(task.taskboardId.value)) {
@@ -144,6 +147,9 @@ console.log(completed.value)
     console.log(taskUpdated, 'task on socket update')
     console.log(todo.value.filter(task => task.id === taskUpdated.id), 'value todo')
     var taskIndex = null;
+
+ 
+
 
     if (taskUpdated.status === 0) { 
       console.log('status is 0')
@@ -162,6 +168,9 @@ console.log(completed.value)
         completed.value.splice(taskIndex, 1)
         return
       } else {
+        taskIndex = todo.value.findIndex((t) => t.id === Number(taskUpdated.id))
+        todo.value[taskIndex] = taskUpdated
+        selectedTask.value = taskUpdated
 return
       }
         
@@ -196,6 +205,10 @@ return
         console.log('splice todo')
         completed.value.splice(taskIndex, 1)
         return
+        } else {
+          taskIndex = progress.value.findIndex((t) => t.id === Number(taskUpdated.id))
+        progress.value[taskIndex] = taskUpdated
+        selectedTask.value = taskUpdated
         }
       }
   } else  {
@@ -228,7 +241,9 @@ return
         progress.value.splice(taskIndex, 1)
         return
       } else {
-        return
+        taskIndex = completed.value.findIndex((t) => t.id === Number(taskUpdated.id))
+        completed.value[taskIndex] = taskUpdated
+        selectedTask.value = taskUpdated
       } }
   } else  {
     console.log(taskUpdated, 'we here ')
