@@ -10,7 +10,7 @@
        <draggable @end='checkMove' class="tasks"  item-key="id" :animation="300" :list="todo" tag="ul" group='tasks' id='0'>
     <template #item="{ element: task }">
       <li id='task'>
-      <div  tag='div' class="task d-flex align-self-left" :class="{selected: selectedTask == task.id}"  @dblclick="taskShow(task.id)" ><div class='task-wrapper' @mousedown="taskSelect(task.id)"> {{ task.title }}</div>
+      <div  tag='div' class="task d-flex align-self-left" :class="{selected: selectedTask.value.id == task.id}"  ><div class='task-wrapper' @mousedown="taskSelect(task)"> {{ task.title }}</div>
       </div>
       </li>
     </template>
@@ -22,7 +22,7 @@
        <draggable @end='checkMove' class="tasks"   item-key="id" :animation="300"  :list="progress" tag="ul" group='tasks' id='1'>
     <template #item="{ element: task }">
       <li id='task'>
-      <div tag='div' class="task d-flex align-self-left" :class="{selected: selectedTask == task.id}"  @dblclick="taskShow(task.id)" ><div class='task-wrapper' @mousedown="taskSelect(task.id)"> {{ task.title }}</div>
+      <div tag='div' class="task d-flex align-self-left" :class="{selected: selectedTask.value.id == task.id}" ><div class='task-wrapper' @mousedown="taskSelect(task)"> {{ task.title }}</div>
       </div>
       </li>
     </template>
@@ -33,7 +33,7 @@
       <draggable @end='checkMove' class="tasks" item-key="id" :animation="300" :list="completed" tag="ul" group='tasks' id='2'>
     <template #item="{ element: task }">
       <li id='task'>
-      <div tag='div' class="task d-flex align-self-left" :class="{selected: selectedTask == task.id}"  @dblclick="taskShow(task.id)" ><div class='task-wrapper' @mousedown="taskSelect(task.id)"> {{ task.title }}</div>
+      <div tag='div' class="task d-flex align-self-left" :class="{selected: selectedTask.value.id == task.id}"   ><div class='task-wrapper' @mousedown="taskSelect(task)"> {{ task.title }}</div>
       </div>
       </li>
     </template>
@@ -48,6 +48,7 @@
         </div>
     
   </div>
+  <TaskComponent :selectedTask='selectedTask'/>
 
 
   <div v-if="!isTasksToggled" class="add-tab">
@@ -73,6 +74,7 @@ import {onMounted, ref, reactive, computed, watch} from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { socket } from '@/utils/socket'
 import draggable from 'vuedraggable';
+import TaskComponent from './TaskComponent.vue';
 
 
 
@@ -96,7 +98,7 @@ const data = reactive({
 })
 const taskboardName = ref({type: String, value: ''})
 
-const selectedTask = ref({type: Number, value: 0 })
+const selectedTask = reactive({type: Object, value: {} })
 
 const tasks = ref([])
 
@@ -117,7 +119,7 @@ console.log(completed.value)
 
   socket.on('task-added', async (newTask) => {
     console.log(newTask, 'newTask')
-    if (newTask.taskboard_id == task.taskboardId.value) {
+    if (newTask.taskboard_id === Number(task.taskboardId.value)) {
       console.log(tasks, 'value taskboards')
     todo.value.push(newTask);
     }
@@ -131,6 +133,11 @@ console.log(completed.value)
   }
   });
    socket.on('task-updated', async (taskUpdated) => {
+    console.log(taskUpdated.taskboard_id, 'taskboard updated-id')
+    console.log(task.taskboardId, 'taskobard-id')
+    if (taskUpdated.taskboard_id !== Number(task.taskboardId.value)) {
+      return
+    }
     console.log(taskUpdated, 'task on socket update')
     console.log(todo.value.filter(task => task.id === taskUpdated.id), 'value todo')
     var taskIndex = null;
@@ -236,15 +243,6 @@ return
       }
   }
     }
-  //   const index = tasks.value.findIndex((t) => t.id === Number(taskId))
-  //  if (index !== -1) {
-  //   tasks.value.splice(index, 1)
-  // }
-
-    // ПРОВЕРИТЬ ЕСТЬ ЛИ ЭЛЕМЕНТ, ЕСЛИ НЕТ ДОБАВИТЬ, А СТАРЫЙ УДАЛИТЬ 
-    // ЧТОБЫ УДАЛИТЬ СТАРЫЙ НУЖНО ЕГО ПОИСКАТЬ В ДВУХ ОСТАВШИХСЯ МАССИВАХ
-
-
   });
 
 })
@@ -254,10 +252,6 @@ async function checkMove(evt){
 const taskId = evt.item._underlying_vm_.id
 const status = Number(evt.to.id)
 
-
-
-//return false
-  // RETURN FALSE TO CANCEL
 
    try {
     const token = document.cookie.match('token=([^;]+)');
@@ -278,30 +272,24 @@ const status = Number(evt.to.id)
     
   }
 }
-
 function taskToggle() {
     isTasksToggled.value = !isTasksToggled.value;
     data.isMessage.value = false;
 }
 
-function taskShow() {
-  console.log('DOUBLE CLICK')
-    // isTasksToggled.value = !isTasksToggled.value 
-}
-
-function taskSelect(id) {
-  console.l
-  selectedTask.value = id
+function taskSelect(task) {
+  console.log(task, 'task param in task select')
+  selectedTask.value = task
   console.log(selectedTask.value, 'selected task value')
+  console.log(selectedTask.value.id, 'id of selected task')
 }
 
  // FETCH TASKS FROM REQUESTED TASKBOARD ON MOUNT
 async function fetchTasks(){
-   
+
     try {
     console.log(task.taskboardId.value, 'taskboard value')
     const token = document.cookie.match('token=([^;]+)');
-
     
     const requestOptions = {
       method: "POST",
@@ -374,7 +362,7 @@ async function addTask() {
   }
 }
 
-watch(task, (newValue, oldValue) => {
+watch(selectedTask, (newValue, oldValue) => {
   console.log('Count changed:', newValue, 'Old value:', oldValue);
 });
 
@@ -385,12 +373,6 @@ function clearValues() {
   task.description.value = '';
   task.dueDate.value = '';
   task.assigneeName.value = '';
-  // task.value = {
-  //   title: '',
-  //   description: '',
-  //   dueData: '',
-  //   assigneeName: '',
-  // }
   console.log(task.value, 'task value')
 }
 

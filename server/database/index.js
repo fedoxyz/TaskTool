@@ -82,6 +82,10 @@ async function setupDB() {
               type: DataTypes.INTEGER,
               allowNull: true,
             },
+            assignee_name: {
+              type: DataTypes.STRING(100),
+              allowNull: true,
+            },
             creator_id: {
               type: DataTypes.INTEGER,
               allowNull: false,
@@ -137,7 +141,7 @@ async function setupDB() {
 
 
       
-        await sequelize.sync({force: false});
+        await sequelize.sync({force: true});
         
         // await db.<ModelName>.create({ <key: "value"> }); // THIS CREATES ENTRIES
     } catch (error) {

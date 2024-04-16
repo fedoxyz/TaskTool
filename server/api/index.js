@@ -214,6 +214,7 @@ app.post('/api/tasks', router, async (req, res, next) => {
     const creatorId = req.decodedToken['id'] 
     console.log(req.body, 'req body on tasks')
     var assigneeId = null;
+    var assigneeName = '';
 
     if (req.body.assigneeName) {
     try {
@@ -226,7 +227,7 @@ app.post('/api/tasks', router, async (req, res, next) => {
     }
   }
     console.log('if user not found dont go here')
-    const task = await db.Task.create({taskboard_id: req.body.taskboard_id, title: req.body.title, description: req.body.description, due_date: req.body.due_date.value, assignee_id: assigneeId, creator_id: creatorId });
+    const task = await db.Task.create({taskboard_id: req.body.taskboard_id, title: req.body.title, description: req.body.description, due_date: req.body.due_date.value, assignee_id: assigneeId, assignee_name: req.body.assigneeName,creator_id: creatorId });
     console.log(assigneeId, 'assignee id')
     if (assigneeId) {
       await db.TaskAssignment.create({task_id: task.id, assignee_id: assigneeId, assigned_date: task.createdAt})
@@ -268,6 +269,22 @@ app.get('/api/overview', router, async (req, res, next) => {
     const tasksCreated = await db.Task.findAll({where: {creator_id: userId}})
     const tasksAssigned = await db.TaskAssignment.findAll({where: {assignee_id: userId}})
     res.json({taskboardsCreated, tasksCreated, tasksAssigned});
+  }catch (error) {
+    console.log(error.message, 'nmessage')
+    res.status(401).json(error.message)
+    next()
+  }
+})
+
+app.put('/api/update-task', router, async (req, res, next) => {
+  try {
+    const userId = req.decodedToken['id'] 
+    const taskId = req.body.taskId 
+    const task = await db.Task.findOne({where: {id: taskId}})
+
+    taskUpdated = await task.update({title: req.body.title, description: req.body.description, assignee_name: req.body.assignee_name})
+
+    res.json(taskUpdated);
   }catch (error) {
     console.log(error.message, 'nmessage')
     res.status(401).json(error.message)
