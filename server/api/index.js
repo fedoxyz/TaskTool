@@ -277,12 +277,24 @@ app.get('/api/overview', router, async (req, res, next) => {
 })
 
 app.post('/api/update-task', router, async (req, res, next) => {
+  var task = {}
   try {
     const userId = req.decodedToken['id'] 
     const taskId = req.body.taskId 
-    const task = await db.Task.findOne({where: {id: taskId}})
+    task = await db.Task.findOne({where: {id: taskId}})
     console.log(req.body, 'req body')
-    taskUpdated = await task.update({title: req.body.title, description: req.body.description, assignee_name: req.body.assignee_name})
+    console.log(req.body.assigned_name, 'ASSIGNEE NAME')
+// IF ASSIGNEE NAME, CHECK TRY TO FIND IT IN DB
+if (req.body.assignee_name) {
+  console.log(req.body.assigned_name, 'ASSIGNEE NAME')
+  const assigneeUser = await User.findOne({where: {username: req.body.assignee_name}})
+  const taskAssignment = await TaskAssignment.findOne({where: {id: task.id}})
+  await taskAssignment.update({assignee_id: assigneeUser.id})
+  taskUpdated = await task.update({title: req.body.title, description: req.body.description, assignee_name: req.body.assignee_name, assignee_id: assigneeUser.id})
+} else {
+  taskUpdated = await task.update({title: req.body.title, description: req.body.description })
+}
+
     console.log(taskUpdated, 'task updated')
 
     res.json(taskUpdated);

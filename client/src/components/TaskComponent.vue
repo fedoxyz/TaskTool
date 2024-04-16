@@ -80,7 +80,7 @@ async function updateTask() {
    const requestOptions = {
       method: "POST",
       headers: { 'Content-Type': 'application/json', 'Authorization': `${token[1]}` },
-      body: JSON.stringify({ taskId: props.selectedTask.value.id, title: updatedTask.title, description: updatedTask.description, assignee_name: updatedTask.assignee_name })
+      body: JSON.stringify({ taskId: props.selectedTask.value.id, title: updatedTask.title, description: updatedTask.description, assignee_name: updatedTask.assigneeName })
       }
       console.log(requestOptions, 'requestOptions')
       const response = await fetch(`${import.meta.env.VITE_API_HOST}:${import.meta.env.VITE_API_PORT}/api/update-task`, requestOptions);
