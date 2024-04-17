@@ -3,7 +3,7 @@
     <h1>Dashboard</h1>
     <h2>My Taskboards</h2>
     <ul>
-    <div v-for="taskboard in taskboardsCreated" class='mytaskboard-wrapper'>
+    <div @click='showTasks(taskboard.dataValues.id)' v-for="taskboard in taskboardsCreated" class='mytaskboard-wrapper'>
       <li id="dashboard">
         {{ taskboard.dataValues.name }} {{ taskboard.dataValues.updatedAt }} 
 
@@ -12,9 +12,11 @@
         In Progress: {{taskboard.tasks.filter(task => task.status === 1).length}}
         
       </li>
+      <ul v-if="tasksDrop.includes(taskboard.dataValues.id )">
       <li v-for="task in taskboard.tasks">
-        {{task.title}} {{task.updatedAt}}
+        {{task.title}}  {{ task.status }}  {{task.updatedAt}}
         </li>
+        </ul>
       </div>
     </ul>
 
@@ -47,6 +49,8 @@ const router = useRouter();
 const taskboardsCreated = ref([]);
 const tasksCreated = ref([]);
 const tasksAssigned = ref([]);
+
+const tasksDrop = ref([])
 
 async function fetchOverview() {
   try {
@@ -81,6 +85,16 @@ async function fetchOverview() {
   } catch (error) {
     console.error(error);
   }
+}
+
+function showTasks(taskboardId) {
+  if (tasksDrop.value.includes(taskboardId)) {
+    tasksDrop.value = tasksDrop.value.filter(id => id !== Number(taskboardId));
+  } else {
+tasksDrop.value.push(taskboardId)
+  }
+    
+
 }
 
 onMounted(async () => {
