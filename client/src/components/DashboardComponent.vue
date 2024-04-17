@@ -4,7 +4,7 @@
     <h2>My Taskboards</h2>
     <ul>
     <div @click='showTasks(taskboard.dataValues.id)' v-for="taskboard in taskboardsCreated" class='mytaskboard-wrapper'>
-      <li id="dashboard">
+      <li class="taskboard" id="dashboard">
         {{ taskboard.dataValues.name }} {{ taskboard.dataValues.updatedAt }} 
 
         All: {{taskboard.tasks.length}}
@@ -122,5 +122,14 @@ h2 {
 
 li#dashboard {
   padding: 10px;
+  
+}
+
+.taskboard {
+  cursor: pointer;
+}
+
+.taskboard:hover {
+  background-color: #aaaaaa23;
 }
 </style>
