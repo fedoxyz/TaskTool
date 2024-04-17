@@ -1,55 +1,60 @@
 <script setup>
-import { onMounted, ref, reactive } from 'vue'
-import { socket } from '@/utils/socket'
-import { useRouter } from 'vue-router';
+import { onMounted, ref, reactive } from "vue";
+import { socket } from "@/utils/socket";
+import { useRouter } from "vue-router";
 
 const router = useRouter();
 
 const taskboard = reactive({
-  id: {type: Number, value: null},
-  name: {type: String, value: ''},
-  creatorId: {type: Number, value: null},
-})
+  id: { type: Number, value: null },
+  name: { type: String, value: "" },
+  creatorId: { type: Number, value: null },
+});
 const data = reactive({
-    isMessage: false,
-    isError: {type: Boolean, value: false},
-    message: {type: String, value: ''}
-})
+  isMessage: false,
+  isError: { type: Boolean, value: false },
+  message: { type: String, value: "" },
+});
 
-const userId = ref(0)
+const userId = ref(0);
 
-const taskboards = ref([])
-
+const taskboards = ref([]);
 
 async function addTaskboard(name) {
-  console.log(name, 'name in addTaskboard()')
+  console.log(name, "name in addTaskboard()");
   try {
-    const token = document.cookie.match('token=([^;]+)');
-    console.log(token[1], '123123')
+    const token = document.cookie.match("token=([^;]+)");
+    console.log(token[1], "123123");
     const requestOptions = {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json',
-      'Authorization': `${token[1]}`,
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `${token[1]}`,
       },
-      body: JSON.stringify({ name })
-      };
-    console.log(requestOptions, 'requestedOptions')
-    const response = await fetch(`${import.meta.env.VITE_API_HOST}:${import.meta.env.VITE_API_PORT}/api/taskboards`, requestOptions)
-     if (!response.ok) {
+      body: JSON.stringify({ name }),
+    };
+    console.log(requestOptions, "requestedOptions");
+    const response = await fetch(
+      `${import.meta.env.VITE_API_HOST}:${
+        import.meta.env.VITE_API_PORT
+      }/api/taskboards`,
+      requestOptions
+    );
+    if (!response.ok) {
       console.error("Failed", response.statusText);
-      router.push('/auth');
-       data.isMessage = true;
-        data.isError = true;
-        data.message = 'Failed to add taskboard';
+      router.push("/auth");
+      data.isMessage = true;
+      data.isError = true;
+      data.message = "Failed to add taskboard";
     } else {
       data.isMessage = false;
-        data.isError = false;
-        data.message = '';
-        taskboard.name.value = '';
+      data.isError = false;
+      data.message = "";
+      taskboard.name.value = "";
     }
   } catch (error) {
-    console.lop('123123')
-    router.push('/auth');
+    console.lop("123123");
+    router.push("/auth");
     console.error(error);
   }
 }
@@ -57,133 +62,157 @@ async function addTaskboard(name) {
 // FETCH API
 async function deleteTask(id) {
   try {
-    const token = document.cookie.match('token=([^;]+)');
+    const token = document.cookie.match("token=([^;]+)");
     const requestOptions = {
       method: "DELETE",
-      headers: { 'Authorization': `${token[1]}` },
+      headers: { Authorization: `${token[1]}` },
     };
-    const response = await fetch(`${import.meta.env.VITE_API_HOST}:${import.meta.env.VITE_API_PORT}/api/taskboards/${id}`, requestOptions);
-  if (!response.ok) {
+    const response = await fetch(
+      `${import.meta.env.VITE_API_HOST}:${
+        import.meta.env.VITE_API_PORT
+      }/api/taskboards/${id}`,
+      requestOptions
+    );
+    if (!response.ok) {
       console.error("Failed", response.statusText);
-      router.push('/auth');
+      router.push("/auth");
     }
-   
   } catch (error) {
-    router.push('/auth');
+    router.push("/auth");
     console.error(error);
   }
 }
 
 function clickTaskboard(id) {
-  router.push({ name: 'Taskboard', params: { id }})
+  router.push({ name: "Taskboard", params: { id } });
 }
-
-
 
 onMounted(async () => {
   await fetchTaskboards();
 
-  socket.on('taskboard-added', async (newTaskboard) => {
-    console.log(newTaskboard, 'newTask')
-    console.log(taskboards.value, 'value taskboards')
+  socket.on("taskboard-added", async (newTaskboard) => {
+    console.log(newTaskboard, "newTask");
+    console.log(taskboards.value, "value taskboards");
     taskboards.value.push(newTaskboard);
   });
 
-  socket.on('taskboard-removed', async (taskId) => {
-    const index = taskboards.value.findIndex((t) => t.id === Number(taskId))
-   if (index !== -1) {
-    taskboards.value.splice(index, 1)
-  }
+  socket.on("taskboard-removed", async (taskId) => {
+    const index = taskboards.value.findIndex((t) => t.id === Number(taskId));
+    if (index !== -1) {
+      taskboards.value.splice(index, 1);
+    }
   });
-
-})
+});
 
 async function fetchTaskboards() {
   try {
-    const token = document.cookie.match('token=([^;]+)');
+    const token = document.cookie.match("token=([^;]+)");
     const requestOptions = {
       method: "get",
-      headers: { 'Authorization': `${token[1]}` },
+      headers: { Authorization: `${token[1]}` },
     };
-    const response = await fetch(`${import.meta.env.VITE_API_HOST}:${import.meta.env.VITE_API_PORT}/api/taskboards`, requestOptions);
+    const response = await fetch(
+      `${import.meta.env.VITE_API_HOST}:${
+        import.meta.env.VITE_API_PORT
+      }/api/taskboards`,
+      requestOptions
+    );
     if (response.ok) {
-      
       const jsonResponse = await response.json();
-      console.log(jsonResponse)
-      userId.value = jsonResponse.userId
-      taskboards.value = jsonResponse.taskboards
-      console.log(userId.value)
+      console.log(jsonResponse);
+      userId.value = jsonResponse.userId;
+      taskboards.value = jsonResponse.taskboards;
+      console.log(userId.value);
     } else {
-      router.push('/auth');
+      router.push("/auth");
     }
-    
   } catch (error) {
-  console.log('1231123123123')
+    console.log("1231123123123");
     console.error(error);
-   //#55166a9e 
+    //#55166a9e
   }
 }
 </script>
 
 <template>
-  <div class='container' style="text-align: center; display: inline-block;"> 
-  <div class='taskboards-wrapper'>
-<h1>Taskboards</h1>
-     
-    <ul>
-    
-      <li @click="clickTaskboard(item.id)" class='d-flex' v-for="item in taskboards" :key="item.id">  
+  <div class="container" style="text-align: center; display: inline-block">
+    <div class="taskboards-wrapper">
+      <h1>Taskboards</h1>
 
-      
-      <router-link :to="{ name: 'Taskboard', params: { id: item.id }, props: { taskboardName: item.name }  }"><div class="taskboard-wrapper d-flex">{{ item.name}}<button v-if="item.creatorId == userId" type="button" class="btn-close btn-close-white" aria-label="Close" @click.stop.prevent="deleteTask(item.id)"></button>
-      </div></router-link>
-        
-      </li>
-    </ul>
+      <ul>
+        <li
+          @click="clickTaskboard(item.id)"
+          class="d-flex"
+          v-for="item in taskboards"
+          :key="item.id"
+        >
+          <router-link
+            :to="{
+              name: 'Taskboard',
+              params: { id: item.id },
+              props: { taskboardName: item.name },
+            }"
+            ><div class="taskboard-wrapper d-flex">
+              {{ item.name
+              }}<button
+                v-if="item.creatorId == userId"
+                type="button"
+                class="btn-close btn-close-white"
+                aria-label="Close"
+                @click.stop.prevent="deleteTask(item.id)"
+              ></button></div
+          ></router-link>
+        </li>
+      </ul>
 
-       <input placeholder="Taskboard title..." id='input' v-model="taskboard.name.value">
-       <div class='controls'>
-   
-    <button @click="addTaskboard(taskboard.name.value)" class='main' id="button">Add Taskboard</button>
-    <router-link to='/dashboard'>
-         <button id='button'>Dashboard</button>
+      <input
+        placeholder="Taskboard title..."
+        id="input"
+        v-model="taskboard.name.value"
+      />
+      <div class="controls">
+        <button
+          @click="addTaskboard(taskboard.name.value)"
+          class="main"
+          id="button"
+        >
+          Add Taskboard
+        </button>
+        <router-link to="/dashboard">
+          <button id="button">Dashboard</button>
         </router-link>
-         
-        </div><span v-if="data.isMessage" :class="{ error: data.isError }">{{data.message}}</span>
-  
+      </div>
+      <span v-if="data.isMessage" :class="{ error: data.isError }">{{
+        data.message
+      }}</span>
     </div>
   </div>
 </template>
 
+<style scoped>
+body {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100vh;
+  margin: 0;
+}
 
-<style scoped> 
- 
-
-  body {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    height: 100vh;
-    margin: 0;
-  }
-
-
-  form {
-    display: flex;
-    padding-left: 12px;
-    padding-right: 12px;
-    margin-bottom: 23px;
-    flex-direction: column;
-    align-items: center;
-    border: 2px solid #ddd;
-    border-radius: 34px;
-    padding-top: 34px;
-    padding-bottom: 34px;
-    background-color: transparent;
-  }
+form {
+  display: flex;
+  padding-left: 12px;
+  padding-right: 12px;
+  margin-bottom: 23px;
+  flex-direction: column;
+  align-items: center;
+  border: 2px solid #ddd;
+  border-radius: 34px;
+  padding-top: 34px;
+  padding-bottom: 34px;
+  background-color: transparent;
+}
 .controls {
-    
-       margin: 1em 0px 1em 0px;
+  margin: 1em 0px 1em 0px;
 }
 
 #button {
@@ -191,16 +220,12 @@ async function fetchTaskboards() {
 }
 
 .taskboard-wrapper {
-   color: #ddd;
-   padding: 10px;
-   justify-content: space-between;
+  color: #ddd;
+  padding: 10px;
+  justify-content: space-between;
 }
 
 .taskboard-wrapper:hover {
   background-color: #aaaaaa23;
-  
-  
-
 }
- 
 </style>

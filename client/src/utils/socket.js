@@ -3,30 +3,27 @@ import { io } from "socket.io-client";
 
 export const state = reactive({
   connected: false,
-  barEvents: []
+  barEvents: [],
 });
 
 const URL = "http://localhost:3001";
-
 
 export const socket = io(URL, {
   // autoConnect: false,
   withCredentials: true,
   extraHeaders: {
-    "my-custom-header": "abcd"
-  }
+    "my-custom-header": "abcd",
+  },
 });
 
-
 socket.on("connect", () => {
-  console.log('connect ')
+  console.log("connect ");
   state.connected = true;
 });
 
 socket.on("disconnect", () => {
   state.connected = false;
 });
-
 
 socket.on("test-event", (message) => {
   console.log("Test event received on client-side");

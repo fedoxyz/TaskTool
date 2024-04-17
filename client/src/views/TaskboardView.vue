@@ -1,5 +1,5 @@
 <script setup>
-import TaskboardComponent from '../components/TaskboardComponent.vue';
+import TaskboardComponent from "../components/TaskboardComponent.vue";
 </script>
 <template>
   <main>

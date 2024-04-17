@@ -1,9 +1,9 @@
 <template>
-  <div id='theContainer'>
+  <div id="theContainer">
     <h1>Hello World</h1>
-    <h2>TaskTool </h2>
+    <h2>TaskTool</h2>
     <router-link to="/app">
-      <button class='main' style="margin: 23px; width: 24%;">Start</button>
+      <button class="main" style="margin: 23px; width: 24%">Start</button>
     </router-link>
   </div>
 </template>
@@ -24,6 +24,4 @@ h2 {
   font-family: system-ui;
   color: #ddd;
 }
-
-
 </style>
