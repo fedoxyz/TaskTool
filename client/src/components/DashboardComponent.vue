@@ -3,16 +3,19 @@
     <h1>Dashboard</h1>
     <h2>My Taskboards</h2>
     <ul>
-      <li id="dashboard" v-for="taskboard in taskboardsCreated">
-        {{ taskboard.name }} {{ taskboard.updatedAt }} 
-        NEED TO SHOW MANY TASKS THERE ARE
-        All:
-        Todo:
-        In Progress:
-        <li v-for="task in taskboard.tasks">
-        {{task.id}} {{task.title}}
-        </li>
+    <div v-for="taskboard in taskboardsCreated" class='mytaskboard-wrapper'>
+      <li id="dashboard">
+        {{ taskboard.dataValues.name }} {{ taskboard.dataValues.updatedAt }} 
+
+        All: {{taskboard.tasks.length}}
+        Todo: {{taskboard.tasks.filter(task => task.status === 0).length}}
+        In Progress: {{taskboard.tasks.filter(task => task.status === 1).length}}
+        
       </li>
+      <li v-for="task in taskboard.tasks">
+        {{task.title}} {{task.updatedAt}}
+        </li>
+      </div>
     </ul>
 
     <h2>Tasks</h2>
@@ -82,6 +85,7 @@ async function fetchOverview() {
 
 onMounted(async () => {
   await fetchOverview();
+  console.log(taskboardsCreated.value, 'taskboards created')
 });
 </script>
 
