@@ -38,7 +38,7 @@ async function setupDB() {
         allowNull: false,
       },
     });
-    1;
+
     db.User.beforeCreate(async (user) => {
       const salt = await bcrypt.genSaltSync(10);
       user.password = bcrypt.hashSync(user.password, salt);

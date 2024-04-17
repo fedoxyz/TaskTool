@@ -59,6 +59,7 @@ router.use(async (req, res, next) => {
 });
 
 app.use(express.json());
+
 // GET METHOD API URL | RETRIEVE ITEMS
 app.get("/api/users", async (req, res, next) => {
   try {
@@ -285,12 +286,12 @@ app.get("/api/overview", router, async (req, res, next) => {
     const tasksCreated = await db.Task.findAll({
       where: { creator_id: userId },
     });
-    const tasksAssigned = await db.TaskAssignment.findAll({
+    const tasksAssigned = await db.Task.findAll({
       where: { assignee_id: userId },
     });
     res.json({ taskboardsCreated, tasksCreated, tasksAssigned });
   } catch (error) {
-    console.log(error.message, "nmessage");
+    console.log(error.message, "message");
     res.status(401).json(error.message);
     next();
   }
@@ -298,9 +299,7 @@ app.get("/api/overview", router, async (req, res, next) => {
 
 app.post("/api/update-task", router, async (req, res, next) => {
   var task = {};
-  var newAssignmentId = null;
   try {
-    const userId = req.decodedToken["id"];
     const taskId = req.body.taskId;
     task = await db.Task.findOne({ where: { id: taskId } });
     console.log(req.body, "req body");

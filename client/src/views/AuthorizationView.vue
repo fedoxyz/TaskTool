@@ -1,5 +1,5 @@
 <script setup>
-import AuthorizationComponent from '../components/AuthorizationComponent.vue'
+import AuthorizationComponent from "../components/AuthorizationComponent.vue";
 </script>
 <template>
   <main>
