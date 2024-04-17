@@ -4,7 +4,14 @@
     <h2>My Taskboards</h2>
     <ul>
       <li id="dashboard" v-for="taskboard in taskboardsCreated">
-        {{ taskboard.name }} {{ taskboard.updatedAt }}
+        {{ taskboard.name }} {{ taskboard.updatedAt }} 
+        NEED TO SHOW MANY TASKS THERE ARE
+        All:
+        Todo:
+        In Progress:
+        <li v-for="task in taskboard.tasks">
+        {{task.id}} {{task.title}}
+        </li>
       </li>
     </ul>
 

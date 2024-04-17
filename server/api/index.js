@@ -216,8 +216,6 @@ app.post("/api/tasks", router, async (req, res, next) => {
     const creatorId = req.decodedToken["id"];
     console.log(req.body, "req body on tasks");
     var assigneeId = null;
-    var assigneeName = "";
-
     if (req.body.assigneeName) {
       try {
         console.log(req.body.assigneeName);
@@ -280,16 +278,28 @@ app.put("/api/tasks", router, async (req, res, next) => {
 app.get("/api/overview", router, async (req, res, next) => {
   try {
     const userId = req.decodedToken["id"];
+    
     const taskboardsCreated = await db.TaskBoard.findAll({
       where: { creatorId: userId },
     });
-    const tasksCreated = await db.Task.findAll({
-      where: { creator_id: userId },
-    });
-    const tasksAssigned = await db.Task.findAll({
-      where: { assignee_id: userId },
-    });
-    res.json({ taskboardsCreated, tasksCreated, tasksAssigned });
+    const tasks = await db.Task.findAll();
+
+    const tasksCreated = tasks.filter(task => task.creator_id === userId); // filter all tasks to make an array with tasks that are created by user
+
+    const taskboardsWithTasks = []; // SEND THIS AS RESPONSE
+    // iterate over taskboardsCreated array to  create an object with created by user taskboards and tasks for every taskboard
+    for (const taskboardId in taskboardsCreated) {
+      const taskboard = taskboardsCreated[taskboardId];
+      const tasksForTaskboard = tasks.filter(task => task.taskboard_id === taskboard.id); // NEED CORRECT TASK ID
+      const taskboardWithTasks = { ...taskboard, tasks: tasksForTaskboard };
+      taskboardsWithTasks.push(taskboardWithTasks);
+    }
+    // find all tasks assigned to user
+    const tasksAssigned = tasks.filter(task => task.assignee_id === userId);
+
+    console.log(taskboardsWithTasks, 'taskboards with tasks')
+    console.log(userId, 'user id')
+    res.json({ taskboardsCreated: taskboardsWithTasks, tasksCreated, tasksAssigned });
   } catch (error) {
     console.log(error.message, "message");
     res.status(401).json(error.message);
