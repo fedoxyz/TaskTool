@@ -7,7 +7,7 @@
           <div class="col" id="column">
             <h3 class="column-title">To Do</h3>
             <draggable
-              @end="checkMove"
+              @end="moveTask"
               class="tasks"
               item-key="id"
               :animation="300"
@@ -44,7 +44,7 @@
               {{ data.message.value }}
             </div>
             <draggable
-              @end="checkMove"
+              @end="moveTask"
               class="tasks"
               item-key="id"
               :animation="300"
@@ -71,7 +71,7 @@
           <div class="col" id="column">
             <h3 class="column-title">Completed</h3>
             <draggable
-              @end="checkMove"
+              @end="moveTask"
               class="tasks"
               item-key="id"
               :animation="300"
@@ -206,6 +206,8 @@ onMounted(async () => {
     }
   });
   socket.on("task-updated", async (taskUpdated, edited) => {
+    console.log(taskUpdated.id == selectedTask.value.id, 'taskUpdated Id == selected Task Id')
+    console.log(taskUpdated.id, selectedTask.value.id)
     console.log(taskUpdated.taskboard_id, "taskboard updated-id");
     console.log(task.taskboardId, "taskobard-id");
     if (taskUpdated.taskboard_id !== Number(task.taskboardId.value)) {
@@ -216,6 +218,9 @@ onMounted(async () => {
       todo.value.filter((task) => task.id === taskUpdated.id),
       "value todo"
     );
+
+  
+
     var taskIndex = null;
 
     if (taskUpdated.status === 0) {
@@ -243,7 +248,9 @@ onMounted(async () => {
               (t) => t.id === Number(taskUpdated.id)
             );
             todo.value[taskIndex] = taskUpdated;
-            selectedTask.value = taskUpdated;
+            if (taskUpdated.id == selectedTask.value.id) {
+      selectedTask.value = taskUpdated
+    } 
             return;
           }
         }
@@ -292,7 +299,9 @@ onMounted(async () => {
               (t) => t.id === Number(taskUpdated.id)
             );
             progress.value[taskIndex] = taskUpdated;
-            selectedTask.value = taskUpdated;
+            if (taskUpdated.id == selectedTask.value.id) {
+      selectedTask.value = taskUpdated
+    } 
           }
         }
       } else {
@@ -339,7 +348,9 @@ onMounted(async () => {
               (t) => t.id === Number(taskUpdated.id)
             );
             completed.value[taskIndex] = taskUpdated;
-            selectedTask.value = taskUpdated;
+               if (taskUpdated.id == selectedTask.value.id) {
+      selectedTask.value = taskUpdated
+    } 
           }
         }
       } else {
@@ -362,10 +373,13 @@ onMounted(async () => {
         }
       }
     }
+    //   if (taskUpdated.id == selectedTask.id) {
+    //   selectedTask.value = selectedTask
+    // } 
   });
 });
 
-async function checkMove(evt) {
+async function moveTask(evt) {
 
   if (evt.item._underlying_vm_.status === Number(evt.to.id)) {
     return
