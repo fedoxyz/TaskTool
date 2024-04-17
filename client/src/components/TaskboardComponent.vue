@@ -366,6 +366,11 @@ onMounted(async () => {
 });
 
 async function checkMove(evt) {
+
+  if (evt.item._underlying_vm_.status === Number(evt.to.id)) {
+    return
+  }
+  console.log(evt, 'evt')
   console.log(Number(evt.to.id));
   const taskId = evt.item._underlying_vm_.id;
   const status = Number(evt.to.id);
