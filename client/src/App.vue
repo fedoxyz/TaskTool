@@ -1,12 +1,12 @@
 <template>
-  <div id="app">
     <router-view></router-view>
-  </div>
 </template>
 
 <style>
 #app {
-  display: block;
+  display: flex;
+  justify-content: center;
+  align-items: center;
   width: 100%;
   margin: 0 auto;
   padding: 0rem;
@@ -36,6 +36,10 @@ body {
   align-items: center;
   margin: 0;
   color: #ddd;
+}
+
+main {
+  width: 100%;
 }
 
 input {

@@ -105,7 +105,7 @@
           </router-link>
         </div>
       </div>
-      <TaskComponent :selectedTask="selectedTask" :showTask="showTask" />
+      <TaskComponent v-if='selectedTask.value.id' :selectedTask="selectedTask"/>
 
       <div v-if="!isTasksToggled" class="add-tab">
         <h1>Add Task</h1>

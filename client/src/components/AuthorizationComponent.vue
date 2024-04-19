@@ -161,8 +161,7 @@ body {
 }
 h1 {
   text-align: center;
-  margin-top: 45px;
-  margin-bottom: 45px;
+  margin-bottom: 1rem;
   color: white;
   width: 100%;
 }
